@@ -29,6 +29,8 @@ process.loadEnvFile(join(ROOT, ".env.local"));
 const TOKEN = process.env.RAILWAY_SANDBOX_TOKEN;
 if (!TOKEN) throw new Error("RAILWAY_SANDBOX_TOKEN is not set in .env.local");
 
+// The probe exists to look at responses whose shape is not yet known, so they stay untyped here.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Json = Record<string, any>;
 type Auth = "project" | "bearer";
 interface Call {
