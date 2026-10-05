@@ -1,6 +1,6 @@
 # What Railway's API did when I probed it
 
-Before writing any app code I ran `scripts/probe.ts` against an empty sandbox project to see how the public GraphQL API behaves for the exact calls this app makes.
+Before writing any app code I ran `scripts/probe.mts` against an empty sandbox project to see how the public GraphQL API behaves for the exact calls this app makes.
 
 - **When:** 5 Oct 2026, 19:58 to 20:18 UTC.
 - **Account:** Trial plan, one project token scoped to the sandbox's `production` environment.
@@ -24,7 +24,7 @@ The same call on `nginx:alpine`, `httpd:alpine` and `caddy:alpine` works: the de
 
 **Not confirmed:** the cause. My guess is the exit code: `traefik/whoami` is a bare Go binary that does not handle `SIGTERM`, so it exits non-zero, while the other three exit cleanly. I could not check this from outside.
 
-**What I did about it:** `traefik/whoami` was in my planned image list and I removed it. An image is now allowed only after `node scripts/probe.ts imageStop <image>` shows that Railway reports its stop. The app shows what Railway reports, so for an image like this it would show "running" for a stopped container; the UI says a stop was accepted and that Railway has not confirmed it, rather than showing "stopped" on its own authority.
+**What I did about it:** `traefik/whoami` was in my planned image list and I removed it. An image is now allowed only after `node scripts/probe.mts imageStop <image>` shows that Railway reports its stop. The app shows what Railway reports, so for an image like this it would show "running" for a stopped container; the UI says a stop was accepted and that Railway has not confirmed it, rather than showing "stopped" on its own authority.
 
 ## 2. Where the API differs from the docs
 

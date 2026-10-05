@@ -2,12 +2,12 @@
  * Probes Railway's public GraphQL API against the sandbox project and records
  * what it actually does.
  *
- *   node scripts/probe.ts lifecycle   create, deploy, stop, restart, redeploy, sleep, delete
- *   node scripts/probe.ts followups   questions the first run raised
- *   node scripts/probe.ts stopTiming  whether a stop sent right after SUCCESS takes effect
- *   node scripts/probe.ts stopPolicy  whether the restart policy explains a stop that has no effect
- *   node scripts/probe.ts imageStop <image>...  whether each image really stops (run before adding one to the allow-list)
- *   node scripts/probe.ts cleanup     delete every spin-probe-* service left by a crashed run
+ *   node scripts/probe.mts lifecycle   create, deploy, stop, restart, redeploy, sleep, delete
+ *   node scripts/probe.mts followups   questions the first run raised
+ *   node scripts/probe.mts stopTiming  whether a stop sent right after SUCCESS takes effect
+ *   node scripts/probe.mts stopPolicy  whether the restart policy explains a stop that has no effect
+ *   node scripts/probe.mts imageStop <image>...  whether each image really stops (run before adding one to the allow-list)
+ *   node scripts/probe.mts cleanup     delete every spin-probe-* service left by a crashed run
  *
  * Add --skip-sleep to leave out the 5 to 15 minute wait for serverless sleep.
  *
@@ -413,7 +413,7 @@ async function imageStop() {
 
 const scenarios: Record<string, () => Promise<void>> = { imageStop, lifecycle, followups, stopTiming, stopPolicy, cleanup: () => cleanup(ALL_PROBES) };
 const scenario = process.argv[2] ?? "";
-if (!scenarios[scenario]) throw new Error(`usage: node scripts/probe.ts <${Object.keys(scenarios).join("|")}> [--skip-sleep]`);
+if (!scenarios[scenario]) throw new Error(`usage: node scripts/probe.mts <${Object.keys(scenarios).join("|")}> [--skip-sleep]`);
 
 try {
   await identify();
