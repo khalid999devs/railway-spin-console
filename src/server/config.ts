@@ -10,12 +10,12 @@ export const LIMITS = { maxContainers: 3, lifetimeMs: 30 * 60_000 } as const;
 
 /**
  * Images a visitor may run. Each one was checked with
- * `node scripts/probe.ts imageStop <image>`: it serves HTTP on port 80 and
+ * `node scripts/probe.mts imageStop <image>`: it serves HTTP on port 80 and
  * Railway reports its stop. `traefik/whoami` failed that check.
  */
 export const IMAGES: readonly ImageOption[] = [
   { id: "nginx", label: "nginx", image: "nginx:alpine" },
-  { id: "httpd", label: "Apache httpd", image: "httpd:alpine" },
+  { id: "httpd", label: "Apache", image: "httpd:alpine" },
   { id: "caddy", label: "Caddy", image: "caddy:alpine" },
 ];
 export const CONTAINER_PORT = 80;

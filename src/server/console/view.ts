@@ -47,6 +47,7 @@ export function toSnapshot(reading: SandboxReading, context: SnapshotContext): C
     budget: context.budget,
     sandbox: { project: reading.sandbox.projectName, environment: reading.sandbox.environmentName },
     asOf: new Date(reading.asOf).toISOString(),
+    serverTime: new Date(context.now).toISOString(),
     pollAfterMs: active ? ACTIVE_POLL_MS : Math.max(IDLE_POLL_MS, Math.round(2 * context.readIntervalMs)),
     unlocked: context.unlocked,
     mode: context.mode,

@@ -58,6 +58,8 @@ export interface ConsoleSnapshot {
   sandbox: { project: string; environment: string };
   /** When Railway was last read. Everything in `containers` is true as of this moment. */
   asOf: string;
+  /** The server's clock when this was sent, so countdowns do not depend on the visitor's clock. */
+  serverTime: string;
   pollAfterMs: number;
   unlocked: boolean;
   mode: "live" | "fake";
