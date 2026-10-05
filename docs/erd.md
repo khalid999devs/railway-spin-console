@@ -1,6 +1,6 @@
 # ERD: Spin Console
 
-**Status:** draft for review, 6 Oct 2026. **Author:** Khalid Ahammed.
+**Status:** built and deployed, 6 Oct 2026. **Author:** Khalid Ahammed.
 
 ## Problem
 
@@ -33,7 +33,7 @@ One Next.js app (App Router, TypeScript), one Railway service, no database. A se
 **5. Create is idempotent without a database.** The browser makes an operation id per click; the server names the service `spin-<id>`. Railway rejects a duplicate name (two simultaneous creates in the probe produced exactly one), so a repeated request finds the existing service and continues from the missing step. Writes run one at a time through an in-process queue, which makes the three-container cap race-free on one instance. After a call with no response, the server reads Railway before repeating it.
 *Rejected: an idempotency-key table.* Railway's uniqueness rule already is one.
 
-**6. Polling, paced by a token bucket.** The browser polls the app: every 2 s during a transition, every 15 s otherwise, never while the tab is hidden. The server answers from a single-flight cache, so ten tabs cost what one does. Each Railway read spends a token from a bucket sized from the `RateLimit-Policy` header (at 1,000/hour: one token per 4.5 s, burst of 20), which caps reads at 820 an hour whatever browsers do. On a 100/hour plan the same code idles at 90 s.
+**6. Polling, paced by a token bucket.** The browser polls the app at the pace the server asks for: every 2 s during a transition and for 20 s after any write, every 15 s otherwise, never while the tab is hidden. The server answers from a single-flight cache, so ten tabs cost what one does. Each Railway read spends a token from a bucket sized from the `RateLimit-Policy` header (at 1,000/hour: one token per 4.5 s, burst of 20), which caps reads at 820 an hour whatever browsers do. On a 100/hour plan the same code idles at 90 s.
 *Rejected: subscriptions.* My attempt with a project token failed, and a stop does not change `status`, so polling would still be needed. *Rejected: a background poller.* It spends requests when nobody is looking.
 
 **7. One module knows Railway exists, and checks what arrives.** It picks the auth header, classifies errors from the body (they arrive as HTTP 200), keeps the `traceId`, retries only when there was no answer, and parses every response with Zod. A test validates each GraphQL document against the committed schema. An in-memory fake behind the same interface reproduces what the probe saw; tests use it, and `RAILWAY_FAKE=1` runs the app without a token.
@@ -69,9 +69,9 @@ Details in [api-findings.md](api-findings.md).
 1. Reads are open; writes need a passphrase, exchanged for a signed HttpOnly cookie, wrong attempts throttled. A cost barrier, not authentication.
 2. At most 3 containers, stopped ones included.
 3. A fixed list of probed images; no free-text field.
-4. A 30-minute lifetime, enforced by a one-minute tick that calls Railway only when a container is due.
+4. A 30-minute lifetime, enforced on every read and by a one-minute tick that calls Railway only when a container is due.
 5. Serverless sleep on every container, and a hard usage limit on the account.
-6. Destroy only targets services in the sandbox listing named `spin-*`.
+6. Only services in the sandbox listing named `spin-` plus 8 characters, the form the app generates, are ever shown or touched.
 
 ## Known limits
 
@@ -83,7 +83,7 @@ Details in [api-findings.md](api-findings.md).
 
 ## Measuring success
 
-Here: the smoke test passes at phone width, the sandbox is empty afterwards, and the screen matched Railway's dashboard at every step. As a product: time from click to a reachable URL (target under 15 s, mostly Railway's deploy), share of actions needing a second attempt, API requests per active hour against budget, and orphans found by a daily sweep (target zero).
+Here: the smoke test in the README passes at phone width, the sandbox is empty afterwards, and the screen matched Railway's dashboard at every step. As a product: time from click to a reachable URL (target under 15 s, mostly Railway's deploy), share of actions needing a second attempt, API requests per active hour against budget, and orphans found by a daily sweep (target zero).
 
 ## Next
 
