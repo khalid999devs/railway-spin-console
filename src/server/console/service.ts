@@ -37,6 +37,13 @@ async function settle(mutate: () => Promise<unknown>, tookEffect: () => Promise<
   }
 }
 
+/**
+ * Railway accepts a stop and keeps reporting "running" for a second or two,
+ * so no state says "about to change". For this long after any write, every
+ * browser is told to poll at the fast rate.
+ */
+const SETTLE_MS = 20_000;
+
 /** For mutations that are harmless to repeat, so there is nothing to look at first. */
 const cannotTell = async () => false;
 
@@ -52,6 +59,7 @@ export class ConsoleService {
   private readonly now: () => number;
   private readonly enqueue = createSerialQueue();
   private sweeping = false;
+  private lastWriteAt = -Infinity;
 
   constructor({ api, reader, budget, mode, now = Date.now }: Dependencies) {
     this.api = api;
@@ -69,6 +77,7 @@ export class ConsoleService {
       mode: this.mode,
       budget: this.budget.snapshot(),
       readIntervalMs: this.budget.readIntervalMs,
+      settling: this.now() - this.lastWriteAt < SETTLE_MS,
       problem: reading.problem === undefined ? undefined : describeProblem(reading.problem).problem,
     });
     if (snapshot.containers.some((container) => container.state === "expired")) this.sweepInBackground();
@@ -155,6 +164,7 @@ export class ConsoleService {
       try {
         await task({ sandbox: reading.sandbox, owned: ownedInstances(reading.instances) });
       } finally {
+        this.lastWriteAt = this.now();
         await this.reader.refresh().catch(() => undefined);
       }
     });

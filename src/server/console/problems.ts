@@ -1,5 +1,5 @@
 import type { ApiProblem } from "@/lib/contract";
-import { RailwayError, type RailwayErrorKind } from "@/server/railway/errors";
+import { isRailwayError, type RailwayError, type RailwayErrorKind } from "@/server/railway/errors";
 
 export type ConsoleErrorCode = "invalid_request" | "not_found" | "not_allowed" | "cap_reached" | "locked" | "throttled" | "forbidden";
 
@@ -14,6 +14,9 @@ export class ConsoleError extends Error {
     this.name = "ConsoleError";
   }
 }
+
+/** By name, for the same reason as `isRailwayError`. */
+export const isConsoleError = (error: unknown): error is ConsoleError => error instanceof Error && error.name === "ConsoleError";
 
 const CONSOLE_STATUS: Record<ConsoleErrorCode, number> = {
   invalid_request: 400,
@@ -41,11 +44,11 @@ export interface DescribedProblem {
 
 /** Turns any thrown value into plain words plus the facts worth showing: Railway's message and trace id. */
 export function describeProblem(error: unknown): DescribedProblem {
-  if (error instanceof ConsoleError) {
+  if (isConsoleError(error)) {
     const { code, message, retryAfterSeconds } = error;
     return { status: CONSOLE_STATUS[code], problem: { code, message, retryAfterSeconds } };
   }
-  if (error instanceof RailwayError) {
+  if (isRailwayError(error)) {
     const message = RAILWAY_WORDING[error.kind]?.(error) ?? `Railway refused ${error.operation}: "${error.message}".`;
     return {
       status: RAILWAY_STATUS[error.kind] ?? 502,

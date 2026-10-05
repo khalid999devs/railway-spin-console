@@ -400,9 +400,23 @@ describe("Railway as the only source of truth", () => {
 
 describe("snapshot", () => {
   it("tells the browser to poll fast only during a transition", async () => {
+    expect((await ctx.service.snapshot(true)).pollAfterMs).toBe(15_000);
     await ctx.service.create(create("aaaaaaaa"));
     expect((await ctx.service.snapshot(true)).pollAfterMs).toBe(2000);
-    ctx.clock.advance(10 * SECOND);
+    ctx.clock.advance(30 * SECOND);
+    expect((await ctx.service.snapshot(true)).pollAfterMs).toBe(15_000);
+  });
+
+  it("keeps polling fast after a stop, while Railway still reports running", async () => {
+    const container = await running("aaaaaaaa");
+    ctx.clock.advance(30 * SECOND);
+
+    await ctx.service.stop(container.id);
+    const afterStop = await ctx.service.snapshot(true);
+    expect(afterStop.containers[0].state).toBe("running");
+    expect(afterStop.pollAfterMs).toBe(2000);
+
+    ctx.clock.advance(30 * SECOND);
     expect((await ctx.service.snapshot(true)).pollAfterMs).toBe(15_000);
   });
 

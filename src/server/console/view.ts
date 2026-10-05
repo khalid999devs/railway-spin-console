@@ -33,12 +33,14 @@ interface SnapshotContext {
   budget: BudgetSnapshot;
   /** How long one read token takes to refill; idle polling stays at half that pace or slower. */
   readIntervalMs: number;
+  /** True for a short while after any write, when Railway may not yet report its effect. */
+  settling: boolean;
   problem?: ApiProblem;
 }
 
 export function toSnapshot(reading: SandboxReading, context: SnapshotContext): ConsoleSnapshot {
   const containers = ownedInstances(reading.instances).map((instance) => toView(instance, context.now));
-  const active = containers.some((container) => container.transitional);
+  const active = context.settling || containers.some((container) => container.transitional);
   return {
     containers,
     limits: { maxContainers: LIMITS.maxContainers, lifetimeMinutes: LIMITS.lifetimeMs / 60_000, images: [...IMAGES] },

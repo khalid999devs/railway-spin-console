@@ -1,6 +1,6 @@
 import type { Deployment, RailwayApi, Sandbox, ServiceInstance } from "./api";
 import type { RequestBudget } from "./budget";
-import { RailwayError } from "./errors";
+import { isRailwayError, RailwayError } from "./errors";
 
 /** Timings taken from the probe (docs/api-findings.md), rounded. */
 export const OBSERVED_TIMINGS = { deployMs: 8_000, stopMs: 1_500, sleepAfterMs: 8 * 60_000 };
@@ -180,7 +180,7 @@ export class FakeRailway implements RailwayApi {
     this.calls.push(method);
     this.budget?.record();
     const fault = this.faults.get(method)?.shift();
-    if (fault instanceof RailwayError) throw fault;
+    if (isRailwayError(fault)) throw fault;
     const result = effect();
     if (fault === "lost_response") throw new RailwayError("no_response", "Railway did not answer", { operation: method });
     return result;

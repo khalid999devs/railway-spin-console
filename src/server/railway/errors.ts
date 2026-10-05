@@ -35,8 +35,13 @@ export class RailwayError extends Error {
   }
 }
 
+/**
+ * Matches by name rather than `instanceof`: Next.js can load this module once
+ * per bundle, and an error thrown by one copy is not an instance of the other
+ * copy's class.
+ */
 export const isRailwayError = (error: unknown, ...kinds: RailwayErrorKind[]): error is RailwayError =>
-  error instanceof RailwayError && (kinds.length === 0 || kinds.includes(error.kind));
+  error instanceof Error && error.name === "RailwayError" && (kinds.length === 0 || kinds.includes((error as RailwayError).kind));
 
 interface GraphqlError {
   message?: unknown;
