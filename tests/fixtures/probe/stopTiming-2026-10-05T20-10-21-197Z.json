@@ -1,0 +1,1428 @@
+{
+  "scenario": "stopTiming",
+  "startedAt": "2026-10-05T20:10:21.197Z",
+  "requestCount": 106,
+  "events": [
+    {
+      "t": 463,
+      "step": "tokenCheck",
+      "variables": {},
+      "status": 200,
+      "body": {
+        "data": {
+          "projectToken": {
+            "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+            "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+            "name": "test_tok",
+            "project": {
+              "name": "spin-sandbox",
+              "subscriptionType": "trial"
+            },
+            "environment": {
+              "name": "production"
+            }
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 463
+    },
+    {
+      "t": 868,
+      "step": "traefik/whoami@+0s create",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvop9jh-0",
+          "source": {
+            "image": "traefik/whoami"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+            "name": "spin-probe-muvop9jh-0",
+            "createdAt": "2026-10-05T20:10:21.879Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 405
+    },
+    {
+      "t": 1384,
+      "step": "traefik/whoami@+0s deploy",
+      "variables": {
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "42ad3900-8914-4dbd-b995-3e9080ac8db2"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 516
+    },
+    {
+      "t": 1694,
+      "step": "watch:traefik/whoami@+0s toRunning",
+      "afterMs": 309,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 3008,
+      "step": "watch:traefik/whoami@+0s toRunning",
+      "afterMs": 1623,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:10:22.878Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 4323,
+      "step": "watch:traefik/whoami@+0s toRunning",
+      "afterMs": 2938,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:10:22.878Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "CREATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 5641,
+      "step": "watch:traefik/whoami@+0s toRunning",
+      "afterMs": 4256,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:10:22.878Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 10975,
+      "step": "watch:traefik/whoami@+0s toRunning",
+      "afterMs": 9590,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:10:31.245Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 11274,
+      "step": "traefik/whoami@+0s stop#1",
+      "variables": {
+        "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 298
+    },
+    {
+      "t": 11703,
+      "step": "watch:traefik/whoami@+0s afterStop#1",
+      "afterMs": 429,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:10:31.245Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 32317,
+      "step": "watch:traefik/whoami@+0s afterStop#1:timeout",
+      "afterMs": 21043
+    },
+    {
+      "t": 32611,
+      "step": "traefik/whoami@+0s stop#2",
+      "variables": {
+        "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 294
+    },
+    {
+      "t": 32992,
+      "step": "watch:traefik/whoami@+0s afterStop#2",
+      "afterMs": 381,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:10:31.245Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 53629,
+      "step": "watch:traefik/whoami@+0s afterStop#2:timeout",
+      "afterMs": 21018
+    },
+    {
+      "t": 53929,
+      "step": "traefik/whoami@+0s stop#3",
+      "variables": {
+        "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 300
+    },
+    {
+      "t": 54259,
+      "step": "watch:traefik/whoami@+0s afterStop#3",
+      "afterMs": 330,
+      "node": {
+        "id": "e35d4ae8-3417-46f3-bfaa-6e29072e68b6",
+        "serviceId": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "serviceName": "spin-probe-muvop9jh-0",
+        "createdAt": "2026-10-05T20:10:21.896Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "42ad3900-8914-4dbd-b995-3e9080ac8db2",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:10:31.245Z",
+          "createdAt": "2026-10-05T20:10:22.335Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a18c6cb6-cd4b-4169-86dc-8ef51a9fdd5f",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 74828,
+      "step": "watch:traefik/whoami@+0s afterStop#3:timeout",
+      "afterMs": 20899
+    },
+    {
+      "t": 82164,
+      "step": "traefik/whoami@+0s delete",
+      "variables": {
+        "id": "683c4cd9-29b4-4bca-b8f9-591b3e629a40",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 7336
+    },
+    {
+      "t": 82790,
+      "step": "traefik/whoami@+10s create",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvop9jh-1",
+          "source": {
+            "image": "traefik/whoami"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+            "name": "spin-probe-muvop9jh-1",
+            "createdAt": "2026-10-05T20:11:43.680Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 626
+    },
+    {
+      "t": 83320,
+      "step": "traefik/whoami@+10s deploy",
+      "variables": {
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "fe61a3bd-0139-4cdc-96d7-da6325123e49"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 530
+    },
+    {
+      "t": 83683,
+      "step": "watch:traefik/whoami@+10s toRunning",
+      "afterMs": 363,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 84996,
+      "step": "watch:traefik/whoami@+10s toRunning",
+      "afterMs": 1676,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:11:44.877Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 86312,
+      "step": "watch:traefik/whoami@+10s toRunning",
+      "afterMs": 2992,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:11:44.877Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "CREATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 87675,
+      "step": "watch:traefik/whoami@+10s toRunning",
+      "afterMs": 4355,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:11:44.877Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 90607,
+      "step": "watch:traefik/whoami@+10s toRunning",
+      "afterMs": 7287,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:11:50.419Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 100987,
+      "step": "traefik/whoami@+10s stop#1",
+      "variables": {
+        "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 379
+    },
+    {
+      "t": 101319,
+      "step": "watch:traefik/whoami@+10s afterStop#1",
+      "afterMs": 332,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:11:50.419Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 122240,
+      "step": "watch:traefik/whoami@+10s afterStop#1:timeout",
+      "afterMs": 21253
+    },
+    {
+      "t": 122548,
+      "step": "traefik/whoami@+10s stop#2",
+      "variables": {
+        "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 308
+    },
+    {
+      "t": 123079,
+      "step": "watch:traefik/whoami@+10s afterStop#2",
+      "afterMs": 531,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:11:50.419Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 143905,
+      "step": "watch:traefik/whoami@+10s afterStop#2:timeout",
+      "afterMs": 21357
+    },
+    {
+      "t": 144301,
+      "step": "traefik/whoami@+10s stop#3",
+      "variables": {
+        "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 396
+    },
+    {
+      "t": 144671,
+      "step": "watch:traefik/whoami@+10s afterStop#3",
+      "afterMs": 369,
+      "node": {
+        "id": "a62911f5-b198-484b-bd82-912c6e3968b0",
+        "serviceId": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "serviceName": "spin-probe-muvop9jh-1",
+        "createdAt": "2026-10-05T20:11:43.845Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "fe61a3bd-0139-4cdc-96d7-da6325123e49",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:11:50.419Z",
+          "createdAt": "2026-10-05T20:11:44.257Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "2d9db756-fa88-480d-9af2-4c7396cf9b7c",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 165540,
+      "step": "watch:traefik/whoami@+10s afterStop#3:timeout",
+      "afterMs": 21238
+    },
+    {
+      "t": 169192,
+      "step": "traefik/whoami@+10s delete",
+      "variables": {
+        "id": "9e5d109b-1ddb-4b23-b075-2e2bd0791237",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 3652
+    },
+    {
+      "t": 169801,
+      "step": "nginx:alpine@+0s create",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvop9jh-2",
+          "source": {
+            "image": "nginx:alpine"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+            "name": "spin-probe-muvop9jh-2",
+            "createdAt": "2026-10-05T20:13:10.656Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 609
+    },
+    {
+      "t": 170611,
+      "step": "nginx:alpine@+0s deploy",
+      "variables": {
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "f1f863d7-062c-4471-8ae4-3628cf387249"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 810
+    },
+    {
+      "t": 170953,
+      "step": "watch:nginx:alpine@+0s toRunning",
+      "afterMs": 342,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 172301,
+      "step": "watch:nginx:alpine@+0s toRunning",
+      "afterMs": 1690,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:12.551Z",
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "cb2b5126-5efd-4e49-a563-1e7a36308fa7",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 173616,
+      "step": "watch:nginx:alpine@+0s toRunning",
+      "afterMs": 3005,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:12.551Z",
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "cb2b5126-5efd-4e49-a563-1e7a36308fa7",
+              "status": "CREATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 175023,
+      "step": "watch:nginx:alpine@+0s toRunning",
+      "afterMs": 4412,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:12.551Z",
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "cb2b5126-5efd-4e49-a563-1e7a36308fa7",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 176348,
+      "step": "watch:nginx:alpine@+0s toRunning",
+      "afterMs": 5737,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:13:17.361Z",
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "cb2b5126-5efd-4e49-a563-1e7a36308fa7",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 177377,
+      "step": "nginx:alpine@+0s stop#1",
+      "variables": {
+        "id": "f1f863d7-062c-4471-8ae4-3628cf387249"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 1028
+    },
+    {
+      "t": 177790,
+      "step": "watch:nginx:alpine@+0s afterStop#1",
+      "afterMs": 413,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:13:17.361Z",
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "cb2b5126-5efd-4e49-a563-1e7a36308fa7",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 180103,
+      "step": "watch:nginx:alpine@+0s afterStop#1",
+      "afterMs": 2726,
+      "node": {
+        "id": "1b5e7d56-ed41-4642-8fad-16183af61e24",
+        "serviceId": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "serviceName": "spin-probe-muvop9jh-2",
+        "createdAt": "2026-10-05T20:13:10.755Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "f1f863d7-062c-4471-8ae4-3628cf387249",
+          "status": "SUCCESS",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:17.361Z",
+          "createdAt": "2026-10-05T20:13:11.299Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "cb2b5126-5efd-4e49-a563-1e7a36308fa7",
+              "status": "EXITED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 184648,
+      "step": "nginx:alpine@+0s delete",
+      "variables": {
+        "id": "a33fad38-cf15-4ee3-a4b9-411840542c5c",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 4545
+    },
+    {
+      "t": 185039,
+      "step": "nginx:alpine@+10s create",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvop9jh-3",
+          "source": {
+            "image": "nginx:alpine"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "33efc573-e81b-4508-94c5-17a0c8897896",
+            "name": "spin-probe-muvop9jh-3",
+            "createdAt": "2026-10-05T20:13:26.083Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 391
+    },
+    {
+      "t": 185673,
+      "step": "nginx:alpine@+10s deploy",
+      "variables": {
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "3379e68e-fbd6-43fb-b5c2-721c23992bea"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 634
+    },
+    {
+      "t": 185997,
+      "step": "watch:nginx:alpine@+10s toRunning",
+      "afterMs": 324,
+      "node": {
+        "id": "20dc6ba7-20c9-41a4-9e68-c54c86672978",
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "serviceName": "spin-probe-muvop9jh-3",
+        "createdAt": "2026-10-05T20:13:26.098Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T20:13:26.574Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 187415,
+      "step": "watch:nginx:alpine@+10s toRunning",
+      "afterMs": 1742,
+      "node": {
+        "id": "20dc6ba7-20c9-41a4-9e68-c54c86672978",
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "serviceName": "spin-probe-muvop9jh-3",
+        "createdAt": "2026-10-05T20:13:26.098Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:27.262Z",
+          "createdAt": "2026-10-05T20:13:26.574Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "91348579-d443-4da4-99e8-c12f118ceb83",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 188736,
+      "step": "watch:nginx:alpine@+10s toRunning",
+      "afterMs": 3063,
+      "node": {
+        "id": "20dc6ba7-20c9-41a4-9e68-c54c86672978",
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "serviceName": "spin-probe-muvop9jh-3",
+        "createdAt": "2026-10-05T20:13:26.098Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:27.262Z",
+          "createdAt": "2026-10-05T20:13:26.574Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "91348579-d443-4da4-99e8-c12f118ceb83",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 192749,
+      "step": "watch:nginx:alpine@+10s toRunning",
+      "afterMs": 7076,
+      "node": {
+        "id": "20dc6ba7-20c9-41a4-9e68-c54c86672978",
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "serviceName": "spin-probe-muvop9jh-3",
+        "createdAt": "2026-10-05T20:13:26.098Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:13:32.466Z",
+          "createdAt": "2026-10-05T20:13:26.574Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "91348579-d443-4da4-99e8-c12f118ceb83",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 203090,
+      "step": "nginx:alpine@+10s stop#1",
+      "variables": {
+        "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 338
+    },
+    {
+      "t": 203407,
+      "step": "watch:nginx:alpine@+10s afterStop#1",
+      "afterMs": 317,
+      "node": {
+        "id": "20dc6ba7-20c9-41a4-9e68-c54c86672978",
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "serviceName": "spin-probe-muvop9jh-3",
+        "createdAt": "2026-10-05T20:13:26.098Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:13:32.466Z",
+          "createdAt": "2026-10-05T20:13:26.574Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "91348579-d443-4da4-99e8-c12f118ceb83",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 205736,
+      "step": "watch:nginx:alpine@+10s afterStop#1",
+      "afterMs": 2646,
+      "node": {
+        "id": "20dc6ba7-20c9-41a4-9e68-c54c86672978",
+        "serviceId": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "serviceName": "spin-probe-muvop9jh-3",
+        "createdAt": "2026-10-05T20:13:26.098Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "3379e68e-fbd6-43fb-b5c2-721c23992bea",
+          "status": "SUCCESS",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:13:32.466Z",
+          "createdAt": "2026-10-05T20:13:26.574Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "91348579-d443-4da4-99e8-c12f118ceb83",
+              "status": "EXITED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 208428,
+      "step": "nginx:alpine@+10s delete",
+      "variables": {
+        "id": "33efc573-e81b-4508-94c5-17a0c8897896",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 2692
+    },
+    {
+      "t": 209126,
+      "step": "cleanup",
+      "remaining": 0,
+      "total": 1,
+      "afterMs": 337
+    }
+  ]
+}

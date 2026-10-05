@@ -1,0 +1,689 @@
+{
+  "scenario": "stopPolicy",
+  "startedAt": "2026-10-05T20:14:17.386Z",
+  "requestCount": 63,
+  "events": [
+    {
+      "t": 416,
+      "step": "tokenCheck",
+      "variables": {},
+      "status": 200,
+      "body": {
+        "data": {
+          "projectToken": {
+            "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+            "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+            "name": "test_tok",
+            "project": {
+              "name": "spin-sandbox",
+              "subscriptionType": "trial"
+            },
+            "environment": {
+              "name": "production"
+            }
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 416
+    },
+    {
+      "t": 855,
+      "step": "policy=default create",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvoubs9-0",
+          "source": {
+            "image": "traefik/whoami"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+            "name": "spin-probe-muvoubs9-0",
+            "createdAt": "2026-10-05T20:14:18.029Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 439
+    },
+    {
+      "t": 1173,
+      "step": "policy=default read policy",
+      "variables": {
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstance": {
+            "restartPolicyType": "ON_FAILURE",
+            "restartPolicyMaxRetries": 10
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 318
+    },
+    {
+      "t": 1705,
+      "step": "policy=default deploy",
+      "variables": {
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "a04879a2-7dbf-40d6-a07e-bba2904052ed"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 532
+    },
+    {
+      "t": 2668,
+      "step": "watch:policy=default toRunning",
+      "afterMs": 962,
+      "node": {
+        "id": "f8bf3b1f-f497-4c06-8433-9c7f80dbf9bb",
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "serviceName": "spin-probe-muvoubs9-0",
+        "createdAt": "2026-10-05T20:14:18.104Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T20:14:18.818Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 6725,
+      "step": "watch:policy=default toRunning",
+      "afterMs": 5019,
+      "node": {
+        "id": "f8bf3b1f-f497-4c06-8433-9c7f80dbf9bb",
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "serviceName": "spin-probe-muvoubs9-0",
+        "createdAt": "2026-10-05T20:14:18.104Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:14:22.925Z",
+          "createdAt": "2026-10-05T20:14:18.818Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "3f093e83-0dea-41c3-90a9-1aa4b9fcb78d",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 9391,
+      "step": "watch:policy=default toRunning",
+      "afterMs": 7685,
+      "node": {
+        "id": "f8bf3b1f-f497-4c06-8433-9c7f80dbf9bb",
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "serviceName": "spin-probe-muvoubs9-0",
+        "createdAt": "2026-10-05T20:14:18.104Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:14:22.925Z",
+          "createdAt": "2026-10-05T20:14:18.818Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "3f093e83-0dea-41c3-90a9-1aa4b9fcb78d",
+              "status": "CREATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 12001,
+      "step": "watch:policy=default toRunning",
+      "afterMs": 10295,
+      "node": {
+        "id": "f8bf3b1f-f497-4c06-8433-9c7f80dbf9bb",
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "serviceName": "spin-probe-muvoubs9-0",
+        "createdAt": "2026-10-05T20:14:18.104Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:14:22.925Z",
+          "createdAt": "2026-10-05T20:14:18.818Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "3f093e83-0dea-41c3-90a9-1aa4b9fcb78d",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 14645,
+      "step": "watch:policy=default toRunning",
+      "afterMs": 12939,
+      "node": {
+        "id": "f8bf3b1f-f497-4c06-8433-9c7f80dbf9bb",
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "serviceName": "spin-probe-muvoubs9-0",
+        "createdAt": "2026-10-05T20:14:18.104Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:14:31.198Z",
+          "createdAt": "2026-10-05T20:14:18.818Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "3f093e83-0dea-41c3-90a9-1aa4b9fcb78d",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 19971,
+      "step": "policy=default stop",
+      "variables": {
+        "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 325
+    },
+    {
+      "t": 20295,
+      "step": "watch:policy=default afterStop",
+      "afterMs": 324,
+      "node": {
+        "id": "f8bf3b1f-f497-4c06-8433-9c7f80dbf9bb",
+        "serviceId": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "serviceName": "spin-probe-muvoubs9-0",
+        "createdAt": "2026-10-05T20:14:18.104Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "a04879a2-7dbf-40d6-a07e-bba2904052ed",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:14:31.198Z",
+          "createdAt": "2026-10-05T20:14:18.818Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "3f093e83-0dea-41c3-90a9-1aa4b9fcb78d",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 40492,
+      "step": "watch:policy=default afterStop:timeout",
+      "afterMs": 20521
+    },
+    {
+      "t": 41133,
+      "step": "policy=default logs",
+      "body": {
+        "data": {
+          "deploymentLogs": [
+            {
+              "timestamp": "2026-10-05T20:14:28.500665835Z",
+              "message": "Starting Container",
+              "severity": "info"
+            },
+            {
+              "timestamp": "2026-10-05T20:14:28.834462558Z",
+              "message": "2026/10/05 20:14:27 Starting up on port 80",
+              "severity": "error"
+            },
+            {
+              "timestamp": "2026-10-05T20:14:38.513009061Z",
+              "message": "Stopping Container",
+              "severity": "info"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 44762,
+      "step": "policy=default delete",
+      "variables": {
+        "id": "74ab4ddc-4239-401e-ae93-7a62c1b6fa8e",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 3629
+    },
+    {
+      "t": 45623,
+      "step": "policy=NEVER create",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvoubs9-1",
+          "source": {
+            "image": "traefik/whoami"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "7fd37a72-6162-4dd5-980c-36408c795a47",
+            "name": "spin-probe-muvoubs9-1",
+            "createdAt": "2026-10-05T20:15:02.829Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 860
+    },
+    {
+      "t": 45948,
+      "step": "policy=NEVER update",
+      "variables": {
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+        "input": {
+          "restartPolicyType": "NEVER"
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceUpdate": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 325
+    },
+    {
+      "t": 46263,
+      "step": "policy=NEVER read policy",
+      "variables": {
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstance": {
+            "restartPolicyType": "NEVER",
+            "restartPolicyMaxRetries": 10
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 312
+    },
+    {
+      "t": 47516,
+      "step": "policy=NEVER deploy",
+      "variables": {
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 1253
+    },
+    {
+      "t": 47867,
+      "step": "watch:policy=NEVER toRunning",
+      "afterMs": 351,
+      "node": {
+        "id": "dffe9fa8-123e-45db-91f1-c3ac8ce658cd",
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "serviceName": "spin-probe-muvoubs9-1",
+        "createdAt": "2026-10-05T20:15:02.846Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T20:15:04.459Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 49945,
+      "step": "watch:policy=NEVER toRunning",
+      "afterMs": 2429,
+      "node": {
+        "id": "dffe9fa8-123e-45db-91f1-c3ac8ce658cd",
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "serviceName": "spin-probe-muvoubs9-1",
+        "createdAt": "2026-10-05T20:15:02.846Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:15:05.387Z",
+          "createdAt": "2026-10-05T20:15:04.459Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a6e4243b-be8d-4c2f-8aae-5cd70abac6eb",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 51255,
+      "step": "watch:policy=NEVER toRunning",
+      "afterMs": 3739,
+      "node": {
+        "id": "dffe9fa8-123e-45db-91f1-c3ac8ce658cd",
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "serviceName": "spin-probe-muvoubs9-1",
+        "createdAt": "2026-10-05T20:15:02.846Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:15:05.387Z",
+          "createdAt": "2026-10-05T20:15:04.459Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a6e4243b-be8d-4c2f-8aae-5cd70abac6eb",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 55199,
+      "step": "watch:policy=NEVER toRunning",
+      "afterMs": 7683,
+      "node": {
+        "id": "dffe9fa8-123e-45db-91f1-c3ac8ce658cd",
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "serviceName": "spin-probe-muvoubs9-1",
+        "createdAt": "2026-10-05T20:15:02.846Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:15:11.673Z",
+          "createdAt": "2026-10-05T20:15:04.459Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a6e4243b-be8d-4c2f-8aae-5cd70abac6eb",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 60634,
+      "step": "policy=NEVER stop",
+      "variables": {
+        "id": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 434
+    },
+    {
+      "t": 60974,
+      "step": "watch:policy=NEVER afterStop",
+      "afterMs": 340,
+      "node": {
+        "id": "dffe9fa8-123e-45db-91f1-c3ac8ce658cd",
+        "serviceId": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "serviceName": "spin-probe-muvoubs9-1",
+        "createdAt": "2026-10-05T20:15:02.846Z",
+        "deletedAt": null,
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "traefik/whoami"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "db9c2fc7-1c98-4eb1-bd0a-6bf761956249",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:15:11.673Z",
+          "createdAt": "2026-10-05T20:15:04.459Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "a6e4243b-be8d-4c2f-8aae-5cd70abac6eb",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 81851,
+      "step": "watch:policy=NEVER afterStop:timeout",
+      "afterMs": 21217
+    },
+    {
+      "t": 82424,
+      "step": "policy=NEVER logs",
+      "body": {
+        "data": {
+          "deploymentLogs": [
+            {
+              "timestamp": "2026-10-05T20:15:09.227709637Z",
+              "message": "Starting Container",
+              "severity": "info"
+            },
+            {
+              "timestamp": "2026-10-05T20:15:09.950580159Z",
+              "message": "2026/10/05 20:15:08 Starting up on port 80",
+              "severity": "error"
+            },
+            {
+              "timestamp": "2026-10-05T20:15:18.831184130Z",
+              "message": "Stopping Container",
+              "severity": "info"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 87425,
+      "step": "policy=NEVER delete",
+      "variables": {
+        "id": "7fd37a72-6162-4dd5-980c-36408c795a47",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 5001
+    },
+    {
+      "t": 88137,
+      "step": "cleanup",
+      "remaining": 0,
+      "total": 1,
+      "afterMs": 306
+    }
+  ]
+}

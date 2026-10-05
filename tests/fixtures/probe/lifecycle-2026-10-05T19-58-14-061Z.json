@@ -1,0 +1,1197 @@
+{
+  "startedAt": "2026-10-05T19:58:14.061Z",
+  "requestCount": 68,
+  "events": [
+    {
+      "t": 383,
+      "step": "tokenCheck",
+      "variables": {},
+      "status": 200,
+      "body": {
+        "data": {
+          "projectToken": {
+            "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+            "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+            "name": "test_tok",
+            "project": {
+              "name": "spin-sandbox",
+              "subscriptionType": "trial"
+            },
+            "environment": {
+              "name": "production"
+            }
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 383
+    },
+    {
+      "t": 727,
+      "step": "auth:projectTokenAsBearer",
+      "variables": {},
+      "status": 200,
+      "body": {
+        "errors": [
+          {
+            "message": "Project Token not found",
+            "locations": [
+              {
+                "line": 1,
+                "column": 20
+              }
+            ],
+            "path": [
+              "projectToken"
+            ],
+            "extensions": {
+              "code": "INTERNAL_SERVER_ERROR"
+            },
+            "traceId": "155787689890119887"
+          }
+        ],
+        "data": null
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 343
+    },
+    {
+      "t": 1045,
+      "step": "error:stopMissingDeployment",
+      "variables": {
+        "id": "00000000-0000-0000-0000-000000000000"
+      },
+      "status": 200,
+      "body": {
+        "errors": [
+          {
+            "message": "Deployment not found",
+            "locations": [
+              {
+                "line": 1,
+                "column": 31
+              }
+            ],
+            "path": [
+              "deploymentStop"
+            ],
+            "extensions": {
+              "code": "INTERNAL_SERVER_ERROR"
+            },
+            "traceId": "485077830091315156"
+          }
+        ],
+        "data": null
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 318
+    },
+    {
+      "t": 1350,
+      "step": "error:deleteMissingService",
+      "variables": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "errors": [
+          {
+            "message": "Not Authorized",
+            "locations": [
+              {
+                "line": 1,
+                "column": 64
+              }
+            ],
+            "path": [
+              "serviceDelete"
+            ],
+            "extensions": {
+              "code": "INTERNAL_SERVER_ERROR"
+            },
+            "traceId": "1211156002576210590"
+          }
+        ],
+        "data": null
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 305
+    },
+    {
+      "t": 1842,
+      "step": "serviceCreate",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvo9oh9",
+          "source": {
+            "image": "nginx:alpine"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceCreate": {
+            "id": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+            "name": "spin-probe-muvo9oh9",
+            "createdAt": "2026-10-05T19:58:15.705Z"
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 492
+    },
+    {
+      "t": 2160,
+      "step": "watch:afterCreate",
+      "afterMs": 318,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": false,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": null
+      }
+    },
+    {
+      "t": 3214,
+      "step": "serviceCreate:sameName",
+      "variables": {
+        "input": {
+          "projectId": "ce97424d-85b3-4e63-871a-b01c7b204818",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "name": "spin-probe-muvo9oh9",
+          "source": {
+            "image": "nginx:alpine"
+          }
+        }
+      },
+      "status": 200,
+      "body": {
+        "errors": [
+          {
+            "message": "A service named \"spin-probe-muvo9oh9\" already exists in this project",
+            "locations": [
+              {
+                "line": 1,
+                "column": 55
+              }
+            ],
+            "path": [
+              "serviceCreate"
+            ],
+            "extensions": {
+              "code": "BAD_USER_INPUT"
+            },
+            "traceId": "942021353534000408"
+          }
+        ],
+        "data": null
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 1054
+    },
+    {
+      "t": 3526,
+      "step": "update:sleepApplication",
+      "variables": {
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+        "input": {
+          "sleepApplication": true
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceUpdate": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 312
+    },
+    {
+      "t": 3837,
+      "step": "update:numReplicasZero",
+      "variables": {
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+        "input": {
+          "numReplicas": 0
+        }
+      },
+      "status": 200,
+      "body": {
+        "errors": [
+          {
+            "message": "Error in numReplicas - Invalid input",
+            "locations": [
+              {
+                "line": 2,
+                "column": 5
+              }
+            ],
+            "path": [
+              "serviceInstanceUpdate"
+            ],
+            "extensions": {
+              "code": "BAD_USER_INPUT"
+            },
+            "traceId": "8150237954655095912"
+          }
+        ],
+        "data": null
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 311
+    },
+    {
+      "t": 4141,
+      "step": "watch:afterUpdate",
+      "afterMs": 304,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": null
+      }
+    },
+    {
+      "t": 4656,
+      "step": "deploy:first",
+      "variables": {
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "e213902c-e275-4509-a98e-48c019806ba1"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 515
+    },
+    {
+      "t": 4955,
+      "step": "watch:toRunning",
+      "afterMs": 299,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": null,
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 6276,
+      "step": "watch:toRunning",
+      "afterMs": 1620,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:19.053Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "INITIALIZING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 7588,
+      "step": "watch:toRunning",
+      "afterMs": 2932,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:19.053Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "CREATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 8913,
+      "step": "watch:toRunning",
+      "afterMs": 4257,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:19.053Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 14486,
+      "step": "watch:toRunning",
+      "afterMs": 9830,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": []
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:27.153Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": null,
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 15610,
+      "step": "domainCreate",
+      "variables": {
+        "input": {
+          "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+          "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701",
+          "targetPort": 80
+        }
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDomainCreate": {
+            "id": "beb0d819-be49-4352-927f-3763526b17eb",
+            "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+            "targetPort": 80
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 1123
+    },
+    {
+      "t": 16488,
+      "step": "http:domainReachable",
+      "afterMs": 877,
+      "seen": "http 200"
+    },
+    {
+      "t": 16807,
+      "step": "watch:afterDomain",
+      "afterMs": 319,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:27.153Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 17885,
+      "step": "subscription",
+      "outcome": "next: {\"errors\":[{\"message\":\"Problem processing request\"}]}"
+    },
+    {
+      "t": 18200,
+      "step": "stop:first",
+      "variables": {
+        "id": "e213902c-e275-4509-a98e-48c019806ba1"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 315
+    },
+    {
+      "t": 18524,
+      "step": "watch:toStopped",
+      "afterMs": 324,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:27.153Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 19834,
+      "step": "watch:toStopped",
+      "afterMs": 1634,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:27.153Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "EXITED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 27838,
+      "step": "http:domainWhileStopped",
+      "afterMs": 8003,
+      "seen": "failed (TimeoutError)"
+    },
+    {
+      "t": 30725,
+      "step": "restart:stopped",
+      "variables": {
+        "id": "e213902c-e275-4509-a98e-48c019806ba1"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentRestart": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 886
+    },
+    {
+      "t": 31040,
+      "step": "watch:restartToRunning",
+      "afterMs": 315,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:44.595Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 31335,
+      "step": "stop:second",
+      "variables": {
+        "id": "e213902c-e275-4509-a98e-48c019806ba1"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 295
+    },
+    {
+      "t": 31656,
+      "step": "watch:toStoppedAgain",
+      "afterMs": 321,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:44.595Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 33002,
+      "step": "watch:toStoppedAgain",
+      "afterMs": 1667,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "e213902c-e275-4509-a98e-48c019806ba1",
+          "status": "SUCCESS",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:44.595Z",
+          "createdAt": "2026-10-05T19:58:18.458Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+              "status": "EXITED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 33306,
+      "step": "stop:alreadyStopped",
+      "variables": {
+        "id": "e213902c-e275-4509-a98e-48c019806ba1"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deploymentStop": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 304
+    },
+    {
+      "t": 33942,
+      "step": "deploy:second",
+      "variables": {
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceInstanceDeployV2": "eeb04823-d821-4687-8a01-c2636d131cb6"
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 635
+    },
+    {
+      "t": 34272,
+      "step": "watch:redeployToRunning",
+      "afterMs": 330,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "INITIALIZING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": null,
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": []
+        }
+      }
+    },
+    {
+      "t": 35584,
+      "step": "watch:redeployToRunning",
+      "afterMs": 1642,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:48.492Z",
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "4d84e8ca-243e-4f60-bfc7-476ee0917d07",
+              "status": "CREATED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 36910,
+      "step": "watch:redeployToRunning",
+      "afterMs": 2968,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "DEPLOYING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T19:58:48.492Z",
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "4d84e8ca-243e-4f60-bfc7-476ee0917d07",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 40827,
+      "step": "watch:redeployToRunning",
+      "afterMs": 6885,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:54.299Z",
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "4d84e8ca-243e-4f60-bfc7-476ee0917d07",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 41130,
+      "step": "previousDeploymentAfterRedeploy",
+      "variables": {
+        "id": "e213902c-e275-4509-a98e-48c019806ba1"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deployment": {
+            "id": "e213902c-e275-4509-a98e-48c019806ba1",
+            "status": "REMOVING",
+            "deploymentStopped": true,
+            "statusUpdatedAt": "2026-10-05T19:58:54.867Z",
+            "instances": [
+              {
+                "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+                "status": "EXITED"
+              }
+            ]
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 303
+    },
+    {
+      "t": 56458,
+      "step": "previousDeploymentAfterRedeploy:+15s",
+      "variables": {
+        "id": "e213902c-e275-4509-a98e-48c019806ba1"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "deployment": {
+            "id": "e213902c-e275-4509-a98e-48c019806ba1",
+            "status": "REMOVED",
+            "deploymentStopped": true,
+            "statusUpdatedAt": "2026-10-05T19:58:56.672Z",
+            "instances": [
+              {
+                "id": "9c4ec653-1e2c-497c-97d3-8695f074438e",
+                "status": "REMOVED"
+              }
+            ]
+          }
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 327
+    },
+    {
+      "t": 56767,
+      "step": "watch:toSleeping",
+      "afterMs": 309,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T19:58:54.299Z",
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "4d84e8ca-243e-4f60-bfc7-476ee0917d07",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 525216,
+      "step": "watch:toSleeping",
+      "afterMs": 468758,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "SLEEPING",
+          "deploymentStopped": true,
+          "statusUpdatedAt": "2026-10-05T20:06:47.403Z",
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "4d84e8ca-243e-4f60-bfc7-476ee0917d07",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 526726,
+      "step": "http:wakeByRequest",
+      "afterMs": 1510,
+      "seen": "http 200"
+    },
+    {
+      "t": 527062,
+      "step": "watch:afterWake",
+      "afterMs": 336,
+      "node": {
+        "id": "7d18db8f-5d22-45c4-b8d7-e90b7d215d39",
+        "serviceId": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "serviceName": "spin-probe-muvo9oh9",
+        "createdAt": "2026-10-05T19:58:15.735Z",
+        "sleepApplication": true,
+        "numReplicas": null,
+        "source": {
+          "image": "nginx:alpine"
+        },
+        "domains": {
+          "serviceDomains": [
+            {
+              "id": "beb0d819-be49-4352-927f-3763526b17eb",
+              "domain": "spin-probe-muvo9oh9-production.up.railway.app",
+              "targetPort": 80
+            }
+          ]
+        },
+        "latestDeployment": {
+          "id": "eeb04823-d821-4687-8a01-c2636d131cb6",
+          "status": "SUCCESS",
+          "deploymentStopped": false,
+          "statusUpdatedAt": "2026-10-05T20:07:00.544Z",
+          "createdAt": "2026-10-05T19:58:47.720Z",
+          "staticUrl": "spin-probe-muvo9oh9-production.up.railway.app",
+          "instances": [
+            {
+              "id": "4d84e8ca-243e-4f60-bfc7-476ee0917d07",
+              "status": "RUNNING"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "t": 531868,
+      "step": "serviceDelete",
+      "variables": {
+        "id": "ae936174-8ddb-43f7-aab7-ee8d830d25fb",
+        "environmentId": "eab5a820-c3d1-4644-b3a6-94413fb3a701"
+      },
+      "status": 200,
+      "body": {
+        "data": {
+          "serviceDelete": true
+        }
+      },
+      "rate": {
+        "ratelimit-policy": "\"default\";q=1000;w=3600"
+      },
+      "ms": 4806
+    },
+    {
+      "t": 532185,
+      "step": "watch:toGone",
+      "afterMs": 317,
+      "node": null
+    },
+    {
+      "t": 532783,
+      "step": "cleanup",
+      "remaining": 0,
+      "total": 0,
+      "afterMs": 297
+    }
+  ]
+}
