@@ -290,7 +290,7 @@ SESSION_SECRET=          # openssl rand -hex 32
 npm run dev
 ```
 
-The app reads the project and environment from the token, so there are no ids to configure.
+The app reads the project and environment from the token, so there are no ids to configure. Keep `$` out of the values, or write it as `\$`: Next.js treats `$NAME` in an env file as a reference to another variable.
 
 | Script | What it runs |
 |---|---|
