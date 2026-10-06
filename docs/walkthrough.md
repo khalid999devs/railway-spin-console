@@ -76,6 +76,7 @@ Route handlers are plain functions from `Request` to `Response`, so the tests ca
 - **Refusals came back as HTTP 500 in the real server, and every unit test passed.** Next.js loads a module once per bundle, so an error thrown by the runtime's copy of `ConsoleError` was not an `instanceof` the route's copy. I found it by running the lifecycle against real Railway through `next dev`. Errors are now matched by name, and the Playwright test checks a refusal through the production build.
 - **After a stop, the page would have waited 15 seconds to notice.** Railway reports "running" for a second or two after accepting a stop, so no state says "about to change". The server now asks browsers to poll fast for 20 seconds after any write.
 - **A stale repeat of a create could restart a stopped container.** Create now brings a service up only if it has never been deployed.
+- **A delete that outlived the timeout.** On the live app one `serviceDelete` took more than 15 seconds. The transport gave up, the service looked at Railway, saw the container gone and reported success: "look before repeating" doing its job in production. Writes now get 30 seconds.
 
 ## How I would extend it
 

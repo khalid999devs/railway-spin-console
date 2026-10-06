@@ -111,6 +111,8 @@ Two consequences. An authorization failure and a missing resource can look the s
 
 **Observed, 12 deletes:** `serviceDelete` took 2.7 to 7.3 s to return, and the service was missing from the very next listing every time, including when deleted mid-deploy. I did not see a deleted service linger in the listing.
 
+**Observed later, on the deployed app:** one `serviceDelete` had not answered after 15 s, the app's timeout at the time. The service was gone from the listing when the app checked. So the call can be much slower than the probe suggested, and a client should not treat a timeout as a failure.
+
 ## 9. Not confirmed, or still open
 
 - Whether `deploymentRestart` still resumes a deployment that has been stopped for hours. I tested stops of up to two minutes. If it fails, the app falls back to a fresh deploy.
