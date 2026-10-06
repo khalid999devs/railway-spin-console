@@ -50,24 +50,23 @@ async function pass(page: Page, takeScreenshot: boolean): Promise<Row[]> {
   };
   const card = page.getByRole("article");
   const chip = (label: string) => card.getByText(label, { exact: true });
-  const reported = async () => (await card.locator("p", { hasText: "Railway reports:" }).innerText()).replace("Railway reports: ", "");
+  const reported = async () => (await card.locator("p", { hasText: "Railway reports" }).innerText()).replace("Railway reports ", "");
 
   await timed("Open the page", async () => {
     await page.goto(baseURL!);
-    await page.getByText("Read-only.").waitFor();
+    await page.getByText("Read-only until unlocked.").waitFor();
     return `locked, ${await page.getByRole("article").count()} containers`;
   });
 
   await timed("Unlock with the passphrase", async () => {
-    await page.getByRole("button", { name: "Unlock to spin up" }).click();
     await page.getByLabel("Passphrase").fill(passphrase!);
-    await page.getByRole("button", { name: "Unlock", exact: true }).click();
-    await page.getByText("Unlocked.").waitFor();
+    await page.getByRole("button", { name: "Unlock" }).click();
+    await page.getByRole("button", { name: "Lock", exact: true }).waitFor();
     return "unlocked";
   });
 
   await timed("Spin up (double click) until the card appears", async () => {
-    await page.getByRole("button", { name: "Spin up" }).dblclick();
+    await page.locator("form").getByRole("button", { name: "Spin up" }).dblclick();
     await card.first().waitFor();
     return `${await card.count()} container, ${await card.getByRole("heading").innerText()}`;
   });
@@ -104,7 +103,7 @@ async function pass(page: Page, takeScreenshot: boolean): Promise<Row[]> {
   await timed("Destroy (two taps) until the card is gone", async () => {
     await card.getByRole("button", { name: "Destroy" }).click();
     await card.getByRole("button", { name: "Tap again to destroy" }).click();
-    await page.getByText("Nothing is running.").waitFor({ timeout: 60_000 });
+    await page.getByText("No containers yet.").waitFor({ timeout: 60_000 });
     return "0 containers";
   });
 

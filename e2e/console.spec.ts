@@ -3,8 +3,8 @@ import type { ApiProblem, ConsoleSnapshot } from "../src/lib/contract";
 
 test("spin up, spin down, spin up again and destroy, at phone width", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("Nothing is running.")).toBeVisible();
-  await expect(page.getByText("Read-only.")).toBeVisible();
+  await expect(page.getByText("No containers yet.")).toBeVisible();
+  await expect(page.getByText("Read-only until unlocked.")).toBeVisible();
 
   await test.step("a visitor without the passphrase cannot write", async () => {
     const response = await page.request.post("/api/containers", { data: { operationId: "aaaaaaaa", imageId: "nginx" } });
@@ -12,24 +12,24 @@ test("spin up, spin down, spin up again and destroy, at phone width", async ({ p
   });
 
   await test.step("unlock", async () => {
-    await page.getByRole("button", { name: "Unlock to spin up" }).click();
-    await expect(page.getByLabel("Passphrase")).toBeFocused();
     await page.getByLabel("Passphrase").fill("not the passphrase");
-    await page.getByRole("button", { name: "Unlock", exact: true }).click();
+    await page.getByRole("button", { name: "Unlock" }).click();
     await expect(page.getByText("That passphrase is not right.")).toBeVisible();
 
     await page.getByLabel("Passphrase").fill("demo");
-    await page.getByRole("button", { name: "Unlock", exact: true }).click();
-    await expect(page.getByText("Unlocked.")).toBeVisible();
+    await page.getByRole("button", { name: "Unlock" }).click();
+    await expect(page.getByRole("button", { name: "Lock", exact: true })).toBeVisible();
   });
 
   const card = page.getByRole("article");
   const chip = (label: string) => card.getByText(label, { exact: true });
 
   await test.step("spin up shows what Railway reports until it is running", async () => {
-    await page.getByRole("button", { name: "Spin up" }).click();
+    await page.getByLabel("Image").selectOption({ label: "caddy:alpine" });
+    await page.locator("form").getByRole("button", { name: "Spin up" }).click();
     await expect(chip("Starting")).toBeVisible();
-    await expect(card.getByText(/Railway reports: status (INITIALIZING|DEPLOYING)/)).toBeVisible();
+    await expect(card.getByText(/Railway reports (INITIALIZING|DEPLOYING) · stopped yes/)).toBeVisible();
+    await expect(card.getByText("caddy:alpine")).toBeVisible();
   });
 
   await test.step("a refusal reaches the browser as the server's reason, not as a server error", async () => {
@@ -41,6 +41,7 @@ test("spin up, spin down, spin up again and destroy, at phone width", async ({ p
     });
     expect(refusal.status).toBe(409);
     expect(refusal.body.problem.message).toBe("Wait until it is running.");
+    await expect(card.getByText("Wait until it is running.")).toBeVisible();
   });
 
   await test.step("a refresh in the middle of the deploy loses nothing", async () => {
@@ -54,7 +55,7 @@ test("spin up, spin down, spin up again and destroy, at phone width", async ({ p
     await card.getByRole("button", { name: "Spin down" }).click();
     await expect(card.getByText(/Spin down accepted .* Waiting for Railway to report it\./)).toBeVisible();
     await expect(chip("Stopped")).toBeVisible({ timeout: 10_000 });
-    await expect(card.getByText("Railway reports: status SUCCESS · stopped yes · instances EXITED")).toBeVisible();
+    await expect(card.getByText("Railway reports SUCCESS · stopped yes · EXITED")).toBeVisible();
   });
 
   await test.step("spin up again resumes the same container", async () => {
@@ -73,6 +74,11 @@ test("spin up, spin down, spin up again and destroy, at phone width", async ({ p
     await card.getByRole("button", { name: "Destroy" }).click();
     await expect(card).toHaveCount(1);
     await card.getByRole("button", { name: "Tap again to destroy" }).click();
-    await expect(page.getByText("Nothing is running.")).toBeVisible();
+    await expect(page.getByText("No containers yet.")).toBeVisible();
+  });
+
+  await test.step("lock again", async () => {
+    await page.getByRole("button", { name: "Lock", exact: true }).click();
+    await expect(page.getByText("Read-only until unlocked.")).toBeVisible();
   });
 });
