@@ -1,51 +1,39 @@
-# What Railway's API did when I probed it
+# Railway API findings
 
-Before writing any app code I ran `scripts/probe.mts` against an empty sandbox project to see how the public GraphQL API behaves for the exact calls this app makes.
+How Railway's public GraphQL API behaves in practice for the calls this app makes, including the places where it differs from the documentation.
 
-- **When:** 5 Oct 2026, 19:58 to 20:18 UTC.
-- **Account:** Trial plan, one project token scoped to the sandbox's `production` environment.
-- **Volume:** 5 scenarios, 447 requests, 12 services created and all deleted.
-- **Raw logs:** `tests/fixtures/probe/*.json` (every request, response and state change, no secrets). The unit tests replay snapshots from them.
+- **Tested:** 5 and 6 October 2026, with a project token on a Trial account.
+- **Method:** [`scripts/probe.mts`](../scripts/probe.mts) runs each call against an empty project and records every request and response.
+- **Recordings:** [`tests/fixtures/probe`](../tests/fixtures/probe). The unit tests replay them.
 
-Everything below marked **Observed** I saw in those runs. **Not confirmed** means I did not see it and the app does not rely on it.
+## Summary
 
-## 1. A stop that Railway accepts but never reports
+- A stopped deployment still reports `status: SUCCESS`. The stop shows only in `deploymentStopped` and the instance status.
+- A starting deployment and a sleeping deployment both report `deploymentStopped: true`.
+- Errors arrive as HTTP 200 with an `errors` array, and the `traceId` is on the error object.
+- The remaining rate-limit budget is not sent in response headers.
+- Service names are unique within a project, even for two requests sent at the same moment.
+- `deploymentRestart` resumes a stopped deployment in about a second.
+- For one image, `traefik/whoami`, a stop is accepted but never reported.
 
-**Observed, 10 of 10 attempts across 6 deployments.** `deploymentStop` on a running `traefik/whoami` deployment returns `true`, the deployment log prints `Stopping Container`, and the container's URL stops answering. But the API goes on reporting the deployment as `status: SUCCESS`, `deploymentStopped: false`, instance `RUNNING`, for as long as I watched (120 s in one run). A second and third stop also return `true` and change nothing.
+## 1. Reading a deployment's state
 
-The same call on `nginx:alpine`, `httpd:alpine` and `caddy:alpine` works: the deployment reads `deploymentStopped: true`, instance `EXITED`, within 1.6 to 3.4 s.
+One request returns the state of every service in an environment:
 
-| Checked | Result |
-|---|---|
-| Timing (stop 0.4 s after `SUCCESS`, or 10 s after) | No difference; fails both ways for whoami, works both ways for nginx |
-| Restart policy (`ON_FAILURE` default, or `NEVER`) | No difference |
-| Container restarted by Railway after the stop? | No; the log shows one start and one stop |
-| `deploymentRestart` afterwards | Works; URL answers again within 0.5 s |
+```graphql
+environment(id: $id) {
+  serviceInstances { edges { node {
+    serviceId serviceName
+    latestDeployment { status deploymentStopped instances { status } }
+  } } }
+}
+```
 
-**Not confirmed:** the cause. My guess is the exit code: `traefik/whoami` is a bare Go binary that does not handle `SIGTERM`, so it exits non-zero, while the other three exit cleanly. I could not check this from outside.
+**After `serviceCreate`,** `latestDeployment` is `null`. Creating a service does not deploy it.
 
-**What I did about it:** `traefik/whoami` was in my planned image list and I removed it. An image is now allowed only after `node scripts/probe.mts imageStop <image>` shows that Railway reports its stop. The app shows what Railway reports, so for an image like this it would show "running" for a stopped container; the UI says a stop was accepted and that Railway has not confirmed it, rather than showing "stopped" on its own authority.
+**After `serviceInstanceDeployV2`,** a deployment takes 6 to 13 seconds to finish and reports:
 
-## 2. Where the API differs from the docs
-
-| # | Docs | Observed |
-|---|---|---|
-| 1 | The error example puts `traceId` inside `extensions`. | `traceId` is on the error object itself, next to `message`, in all 8 error responses I received (7 distinct messages). `extensions` held only `code`. |
-| 2 | The error table lists `BAD_USER_INPUT` as HTTP 400. | It came back as HTTP 200 every time (duplicate service name, `numReplicas: 0`, stopping a sleeping deployment). |
-| 3 | Responses carry `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset`. | None of the three appeared on any of 447 authenticated responses. Only `RateLimit-Policy` did. A client cannot read how much budget is left; it has to count its own requests. |
-| 4 | Limits are listed for Free (100/h), Hobby (1,000/h) and Pro. Trial is not listed. | My Trial account reported `"default";q=1000;w=3600`. |
-| 5 | The "list deployments" example filters with `status: { successfulOnly: true }`. | The schema's `DeploymentStatusInput` has only `in` and `notIn`. (Read from the schema, not executed.) |
-| 6 | `deploymentRestart` is described as restarting a running deployment. | It also resumes a stopped one, with the same instance id, in about a second. Useful, and undocumented. |
-
-## 3. How a deployment's state reads over time
-
-One request, `environment(id) { serviceInstances { ... latestDeployment { status deploymentStopped instances { status } } } }`, returns everything. These are the sequences I saw, polling once a second.
-
-**After `serviceCreate`:** `latestDeployment` is `null`. Creating a service does not deploy it.
-
-**After `serviceInstanceDeployV2`** (11 deploys, 5.7 to 12.9 s to finish):
-
-| Time | `status` | `deploymentStopped` | instances |
+| Time | `status` | `deploymentStopped` | Instance |
 |---|---|---|---|
 | +0.3 s | `INITIALIZING` | `true` | none |
 | +1.6 s | `DEPLOYING` | `true` | `INITIALIZING` |
@@ -53,27 +41,52 @@ One request, `environment(id) { serviceInstances { ... latestDeployment { status
 | +4.3 s | `DEPLOYING` | `true` | `RUNNING` |
 | +9.8 s | `SUCCESS` | `false` | `RUNNING` |
 
-**After `deploymentStop`** (on an image that stops cleanly): for 0.3 to 1.5 s nothing changes, then `SUCCESS` / `true` / `EXITED`. `status` stays `SUCCESS` and `statusUpdatedAt` does not move.
+The instance reads `RUNNING` about five seconds before the deployment reads `SUCCESS`. The public URL returns 404 during that gap.
 
-**After `deploymentRestart` on a stopped deployment:** the first read, 0.3 s after the mutation returned, already shows `SUCCESS` / `false` / `RUNNING` with the same instance id.
+**After a second deploy,** the new deployment becomes `latestDeployment` and the previous one reads `REMOVING`, then `REMOVED`.
 
-**After a second `serviceInstanceDeployV2`:** a new deployment becomes `latestDeployment`; the old one reads `REMOVING` and then `REMOVED` within 15 s.
+### Three cases that are easy to misread
 
-**After 7.8 and 8.2 minutes without traffic** (serverless sleep on): `SLEEPING` / `true` / `RUNNING`. The first HTTP request woke it and got a 200 in 1.5 s; the state then read `SUCCESS` / `false` / `RUNNING`.
+| Situation | `status` | `deploymentStopped` | Instance |
+|---|---|---|---|
+| Stopped | `SUCCESS` | `true` | `EXITED` |
+| Starting | `DEPLOYING` | `true` | `CREATED` |
+| Sleeping | `SLEEPING` | `true` | `RUNNING` |
 
-### Three traps for anyone deriving "is it up?"
+- Treating `SUCCESS` as "running" shows a stopped container as running.
+- Reading `deploymentStopped` first shows a starting container as stopped.
+- Reading the instance first shows a sleeping container as running.
 
-1. A stopped deployment still has `status: SUCCESS`. Reading `SUCCESS` as "up" shows a stopped container as running.
-2. A starting deployment has `deploymentStopped: true`. Reading that flag first shows a starting container as stopped.
-3. A sleeping deployment has `deploymentStopped: true` **and** an instance that reads `RUNNING`. Reading instances first shows a sleeping container as running; reading the flag first shows it as stopped.
+The order that works is `status` first, then `deploymentStopped` and the instance only when `status` is `SUCCESS`.
 
-The order that works: transitional and terminal statuses first, and `deploymentStopped` and instances only when `status` is `SUCCESS`.
+## 2. Stopping and restarting
 
-One more: an instance reads `RUNNING` about 5 s before the deployment reads `SUCCESS`, and the URL returns 404 during that gap. "Running" needs both.
+**`deploymentStop`** returns `true` immediately. For up to 1.5 seconds the state is unchanged, then it reads `SUCCESS`, `deploymentStopped: true`, instance `EXITED`. The `status` and `statusUpdatedAt` fields do not change. Calling it on a deployment that is already stopped also returns `true`.
 
-## 4. Errors
+**`deploymentRestart`** on a stopped deployment brings back the same instance. The state reads `SUCCESS`, not stopped, `RUNNING` within about a second, and the URL answers within half a second.
 
-**Observed:** every failure I triggered arrived as HTTP 200 with an `errors` array. (I did not send a malformed document, which the docs say returns 400.)
+**Requests to a stopped container's URL** get no answer, rather than a quick error.
+
+**Scaling to zero** is not available: `serviceInstanceUpdate` with `numReplicas: 0` is rejected.
+
+### An image whose stop is not reported
+
+For `traefik/whoami`, `deploymentStop` returns `true`, the deployment log prints `Stopping Container`, and the URL stops answering. The API, however, keeps reporting `status: SUCCESS`, `deploymentStopped: false`, instance `RUNNING`. This happened on 10 of 10 attempts across 6 deployments, and was still the case after 120 seconds.
+
+| Checked | Result |
+|---|---|
+| Stopping right after `SUCCESS`, or 10 seconds later | No difference |
+| Restart policy `ON_FAILURE` or `NEVER` | No difference |
+| Whether Railway restarted the container | It did not; the log shows one start and one stop |
+| `deploymentRestart` afterwards | Works; the URL answers again |
+
+`nginx:alpine`, `httpd:alpine` and `caddy:alpine` all stop and report correctly, within 1.6 to 3.4 seconds. The cause was not found. A possible explanation is the exit code: `traefik/whoami` is a bare Go binary that does not handle `SIGTERM`.
+
+Because of this, the app only offers images that pass `npm run probe -- imageStop <image>`, and its interface shows "stop accepted" separately from the state Railway reports.
+
+## 3. Errors
+
+Every error arrived as HTTP 200 with an `errors` array.
 
 | Call | `message` | `extensions.code` |
 |---|---|---|
@@ -85,37 +98,52 @@ One more: an instance reads `RUNNING` about 5 s before the deployment reads `SUC
 | `deploymentStop` on a sleeping deployment | `Deployment is not stoppable` | `BAD_USER_INPUT` |
 | `deploymentRestart` on a sleeping deployment | `Deployment is not restartable` | `BAD_USER_INPUT` |
 
-Two consequences. An authorization failure and a missing resource can look the same (`Not Authorized` for a service that does not exist), so after a failed delete the app re-reads the listing instead of trusting the message. And `INTERNAL_SERVER_ERROR` covers both "you sent the wrong header" and "no such deployment", so the code alone is not enough to classify an error; the app uses the message too.
+Two things follow:
 
-## 5. What a project token can do
+- **The code alone does not identify an error.** `INTERNAL_SERVER_ERROR` covers both a wrong auth header and a missing deployment, so the message has to be read as well.
+- **A missing service looks like a permission error.** `serviceDelete` on an unknown id answers `Not Authorized`, so after a failed delete it is worth checking whether the service still exists.
 
-**Observed:** with only the `Project-Access-Token` header, the token could run `projectToken`, `environment`, `deployment`, `deploymentLogs`, `serviceInstance`, `serviceCreate`, `serviceInstanceUpdate`, `serviceInstanceDeployV2`, `serviceDomainCreate`, `deploymentStop`, `deploymentRestart` and `serviceDelete`. That is everything this app needs, so no account token is used.
+## 4. Differences from the documentation
 
-`projectToken { projectId environmentId }` returns both ids, so nothing is configured by hand.
+| Topic | Documentation | Observed |
+|---|---|---|
+| `traceId` | Shown inside `extensions` | On the error object itself, next to `message` |
+| `BAD_USER_INPUT` | Listed as HTTP 400 | Returned as HTTP 200 |
+| Rate-limit headers | `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` on each response | Not present on any of 447 authenticated responses. Only `RateLimit-Policy` was sent |
+| Trial plan limit | Not listed (Free is 100 per hour, Hobby 1,000) | `RateLimit-Policy: "default";q=1000;w=3600` |
+| Deployment list filter | Example uses `status: { successfulOnly: true }` | The schema's `DeploymentStatusInput` has only `in` and `notIn` |
+| `deploymentRestart` | Described for running deployments | Also resumes a stopped deployment |
 
-**Observed, once:** a `graphql-transport-ws` subscription to `deployment(id)` with the token in the connection payload was acknowledged and then answered `{"errors":[{"message":"Problem processing request"}]}`. I tried one way of passing the token, so this shows that my attempt failed, not that subscriptions are impossible with a project token.
+Since the remaining budget is not reported, a client has to count its own requests.
 
-## 6. Idempotency
+## 5. Creating services and domains
 
-- **Observed:** service names are unique per project. Two `serviceCreate` calls with the same name, sent at the same moment, produced one service and one `already exists` error. This is what the app's idempotent create rests on.
-- **Observed:** `serviceDomainCreate` is not idempotent. A second call on the same service created a second domain (`…-production-38b4.up.railway.app`). The app checks for an existing domain first.
-- **Observed:** `deploymentStop` on an already stopped deployment returns `true` and changes nothing.
+- **Service names are unique within a project.** Two `serviceCreate` calls with the same name, sent at the same moment, produced one service and one `already exists` error.
+- **`serviceDomainCreate` can be called before the first deploy.** The URL returns 404 until the deployment reads `SUCCESS`, and 200 from then on.
+- **`serviceDomainCreate` is not safe to repeat.** A second call on the same service created a second domain.
+- **Adding a domain to a running container** did not trigger a redeploy, and the URL answered within a second.
 
-## 7. Domains
+## 6. Deleting
 
-- **Observed:** a domain can be created before the first deploy. The URL returns 404 until the deployment reads `SUCCESS` and 200 from then on, so the app creates the domain first and the URL is ready the moment the container is.
-- **Observed:** a domain added to a running container answered 200 within 0.9 s and did not trigger a redeploy.
-- **Observed:** requests to a stopped container's URL hang (no response within 8 s) rather than failing quickly.
+`serviceDelete` usually returns in 3 to 7 seconds, and the service is gone from the next listing, including when it is deleted in the middle of a deploy. On one occasion the call had not answered after 15 seconds, although the service had already been removed. A client should not treat a timeout on this call as a failure.
 
-## 8. Deleting
+## 7. Project tokens
 
-**Observed, 12 deletes:** `serviceDelete` took 2.7 to 7.3 s to return, and the service was missing from the very next listing every time, including when deleted mid-deploy. I did not see a deleted service linger in the listing.
+A project token, sent in the `Project-Access-Token` header, could run every call this app needs: `projectToken`, `environment`, `serviceCreate`, `serviceInstanceUpdate`, `serviceInstanceDeployV2`, `serviceDomainCreate`, `deploymentStop`, `deploymentRestart` and `serviceDelete`.
 
-**Observed later, on the deployed app:** one `serviceDelete` had not answered after 15 s, the app's timeout at the time. The service was gone from the listing when the app checked. So the call can be much slower than the probe suggested, and a client should not treat a timeout as a failure.
+`projectToken { projectId environmentId }` returns both ids, so they do not need to be configured.
 
-## 9. Not confirmed, or still open
+A `graphql-transport-ws` subscription to `deployment(id)` with the project token in the connection payload was acknowledged and then answered with `Problem processing request`. Only this one way of passing the token was tried.
 
-- Whether `deploymentRestart` still resumes a deployment that has been stopped for hours. I tested stops of up to two minutes. If it fails, the app falls back to a fresh deploy.
-- Whether a stopped deployment is billed. I will check the usage page a day after the probe and record the answer in the README.
-- What a crashed or failed image deploy looks like. None of my deploys failed, so `crashed` and `failed` in the app come from the schema's enum, not from observation.
-- Behaviour at the rate limit (HTTP 429 and `Retry-After`). I stayed under half the hourly budget on purpose.
+## 8. Serverless sleep
+
+With `sleepApplication` enabled, a container with no traffic went to sleep after about 8 minutes (7.8 and 8.2 minutes in two runs) and reported `SLEEPING`. The first request to its URL woke it and received a 200 in 1.5 seconds.
+
+A sleeping deployment cannot be stopped or restarted through the API; both calls are refused.
+
+## 9. Not tested
+
+- Whether `deploymentRestart` still resumes a deployment that has been stopped for hours. Stops of up to two minutes were tested.
+- Whether a stopped deployment is billed.
+- What a crashed or failed image deployment reports. No deployment failed during testing.
+- Behaviour at the rate limit (HTTP 429 and `Retry-After`).
