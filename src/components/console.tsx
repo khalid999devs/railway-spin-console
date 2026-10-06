@@ -1,16 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useConsoleState, usePublishSnapshot } from "@/hooks/use-console-state";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useConsoleState, usePublishSnapshot, useRefreshState } from "@/hooks/use-console-state";
 import { useServerNow } from "@/hooks/use-server-now";
-import { problemOf } from "@/lib/api-client";
+import { api, problemOf } from "@/lib/api-client";
 import type { ConsoleSnapshot } from "@/lib/contract";
 import { formatClock } from "@/lib/format";
 import { STATE_COPY } from "@/lib/state-copy";
-import { Access } from "./access";
 import { Button } from "./button";
 import { ContainerCard } from "./container-card";
-import { CreatePanel } from "./create-panel";
+import { ControlPanel } from "./control-panel";
 import { ProblemNote } from "./problem-note";
 
 const REPOSITORY = "https://github.com/khalid999devs/railway-spin-console";
@@ -44,76 +44,69 @@ function useAnnouncement(snapshot: ConsoleSnapshot | undefined): string {
 export function Console() {
   const state = useConsoleState();
   const publish = usePublishSnapshot();
+  const refresh = useRefreshState();
+  const lock = useMutation({ mutationFn: api.lock, onSuccess: refresh });
+
   const snapshot = state.data;
   const now = useServerNow(snapshot?.serverTime, state.dataUpdatedAt);
   const announcement = useAnnouncement(snapshot);
-
-  const [unlockOpen, setUnlockOpen] = useState(false);
-  const passphraseInput = useRef<HTMLInputElement>(null);
-  function requestUnlock() {
-    setUnlockOpen(true);
-    // The form is hidden until this render commits; focus once it is visible.
-    requestAnimationFrame(() => passphraseInput.current?.focus());
-  }
+  const problem = snapshot?.problem ?? problemOf(state.error);
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-6">
-      <header>
-        <h1 className="text-xl font-semibold tracking-tight">Spin Console</h1>
-        <p className="mt-1 text-sm text-dim">
-          Spin a container up and down on Railway through its public API. Every state shown here is what Railway reports.
-        </p>
+    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-5 px-4 pb-6 pt-8">
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">Spin Console</h1>
+          <p className="mt-0.5 text-sm text-dim">Spin containers up and down on Railway. Every state shown is what Railway reports.</p>
+        </div>
+        {snapshot?.unlocked ? (
+          <Button onClick={() => lock.mutate()} disabled={lock.isPending}>
+            Lock
+          </Button>
+        ) : null}
       </header>
 
-      <main className="flex flex-col gap-4">
+      <main className="flex flex-col gap-5">
         {!snapshot ? (
-          state.error ? (
-            <section className="rounded-xl border border-line bg-surface p-4">
-              <h2 className="text-sm font-semibold">Could not read the sandbox</h2>
-              <ProblemNote problem={problemOf(state.error)!} className="mt-2" />
+          problem ? (
+            <section className="rounded-lg border border-line bg-surface p-4 text-sm">
+              <h2 className="font-medium">Could not read the sandbox</h2>
+              <ProblemNote problem={problem} className="mt-1" />
               <Button className="mt-3" onClick={() => state.refetch()} disabled={state.isFetching}>
                 {state.isFetching ? "Trying…" : "Try again"}
               </Button>
             </section>
           ) : (
-            <p role="status" className="rounded-xl border border-line bg-surface p-4 text-sm text-dim">
+            <p role="status" className="text-sm text-dim">
               Reading the sandbox from Railway…
             </p>
           )
         ) : (
           <>
             {snapshot.mode === "fake" ? (
-              <p className="rounded-xl border border-line bg-odd-soft px-4 py-3 text-sm text-odd">
-                Fake mode. This is an in-memory simulation of Railway; nothing here creates a real container.
-              </p>
+              <p className="rounded-lg bg-odd-soft px-4 py-2.5 text-sm text-odd">Fake mode: an in-memory Railway. Nothing here is real.</p>
             ) : null}
 
-            {state.error || snapshot.problem ? (
-              <section className="rounded-xl border border-line bg-bad-soft px-4 py-3">
-                <h2 className="text-sm font-semibold text-bad">Showing Railway&apos;s last answer, from {formatClock(snapshot.asOf)}</h2>
-                <ProblemNote problem={snapshot.problem ?? problemOf(state.error)!} className="mt-1" />
+            {problem ? (
+              <section className="rounded-lg bg-bad-soft px-4 py-2.5 text-sm">
+                <h2 className="font-medium text-bad">Showing Railway&apos;s last answer, from {formatClock(snapshot.asOf)}</h2>
+                <ProblemNote problem={problem} className="mt-0.5" />
               </section>
             ) : null}
 
-            <Access unlocked={snapshot.unlocked} open={unlockOpen} onOpenChange={setUnlockOpen} inputRef={passphraseInput} />
-            <CreatePanel snapshot={snapshot} onPublished={publish} onRequestUnlock={requestUnlock} />
+            <ControlPanel snapshot={snapshot} onPublished={publish} />
 
             <section aria-labelledby="containers-heading">
-              <h2 id="containers-heading" className="text-sm font-semibold">
-                Containers{" "}
+              <h2 id="containers-heading" className="flex items-baseline justify-between text-sm font-medium">
+                Containers
                 <span className="font-normal text-dim">
                   {snapshot.containers.length} of {snapshot.limits.maxContainers}
                 </span>
               </h2>
               {snapshot.containers.length === 0 ? (
-                <div className="mt-2 rounded-xl border border-dashed border-line p-5 text-sm">
-                  <p className="font-medium">Nothing is running.</p>
-                  <p className="mt-1 text-dim">
-                    Pick an image above and spin it up. You get a container on Railway with its own public URL, which you can spin
-                    down, spin up again and destroy. At most {snapshot.limits.maxContainers} at a time, and each one is destroyed
-                    after {snapshot.limits.lifetimeMinutes} minutes.
-                  </p>
-                </div>
+                <p className="mt-2 rounded-lg border border-dashed border-line px-4 py-8 text-center text-sm text-dim">
+                  No containers yet. Spin one up to get a container on Railway with its own public URL.
+                </p>
               ) : (
                 <ul className="mt-2 flex flex-col gap-3">
                   {snapshot.containers.map((container) => (
@@ -122,39 +115,22 @@ export function Console() {
                 </ul>
               )}
             </section>
-
-            <section aria-labelledby="legend-heading" className="text-xs text-dim">
-              <h2 id="legend-heading" className="font-semibold text-ink">
-                What the buttons do
-              </h2>
-              <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-                <dt className="font-medium text-ink">Spin down</dt>
-                <dd>Stops the container. The service and its URL stay, and nothing runs.</dd>
-                <dt className="font-medium text-ink">Spin up</dt>
-                <dd>Resumes a stopped container in about a second, or deploys one that never ran.</dd>
-                <dt className="font-medium text-ink">Destroy</dt>
-                <dd>Deletes the service and its URL from Railway.</dd>
-              </dl>
-            </section>
           </>
         )}
       </main>
 
       {snapshot ? (
-        <footer className="mt-auto border-t border-line pt-4 text-xs leading-relaxed text-dim">
+        <footer className="mt-auto flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-line pt-4 text-xs text-dim">
           <p>
-            Sandbox <span className="font-mono">{snapshot.sandbox.project}</span> /{" "}
-            <span className="font-mono">{snapshot.sandbox.environment}</span> · state as of {formatClock(snapshot.asOf)}
+            <span className="font-mono">
+              {snapshot.sandbox.project}/{snapshot.sandbox.environment}
+            </span>{" "}
+            · {snapshot.budget.used.toLocaleString("en")} of {snapshot.budget.limit.toLocaleString("en")} API requests this hour · as of{" "}
+            {formatClock(snapshot.asOf)}
           </p>
-          <p>
-            Railway API budget: {snapshot.budget.used.toLocaleString("en")} of {snapshot.budget.limit.toLocaleString("en")} requests in the
-            last hour, counted by this app{snapshot.budget.source === "assumed" ? " (limit assumed until Railway states it)" : ""}.
-          </p>
-          <p>
-            <a href={REPOSITORY} className="underline underline-offset-2">
-              Source and design notes
-            </a>
-          </p>
+          <a href={REPOSITORY} className="underline underline-offset-2">
+            Source
+          </a>
         </footer>
       ) : null}
 

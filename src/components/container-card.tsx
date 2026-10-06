@@ -29,14 +29,8 @@ interface Accepted {
 
 function reportedLine({ status, deploymentStopped, instances }: ContainerView["reported"]): string {
   if (status === null) return "no deployment";
-  return `status ${status} · stopped ${deploymentStopped ? "yes" : "no"} · instances ${instances.join(", ") || "none"}`;
+  return `${status} · stopped ${deploymentStopped ? "yes" : "no"} · ${instances.join(", ") || "no instances"}`;
 }
-
-const URL_HINT: Partial<Record<ContainerState, string>> = {
-  running: "Opens in a new tab.",
-  sleeping: "Opening it wakes the container.",
-  starting: "Answers once the container is running.",
-};
 
 export function ContainerCard({ container, now, unlocked, onPublished }: ContainerCardProps) {
   const { state, actions } = container;
@@ -73,7 +67,7 @@ export function ContainerCard({ container, now, unlocked, onPublished }: Contain
   const spin = copy.spin;
   const busy = act.isPending;
   const doing = (action: ContainerAction) => busy && act.variables === action;
-  const spinRefusal = unlocked ? (actions[spin].allowed ? null : actions[spin].reason) : "Locked. Unlock above to make changes.";
+  const refusal = actions[spin].allowed ? null : actions[spin].reason;
 
   const waited = accepted ? now - accepted.at : 0;
   const awaitingReport = accepted !== null && waited < UNCONFIRMED_AFTER_MS;
@@ -83,15 +77,14 @@ export function ContainerCard({ container, now, unlocked, onPublished }: Contain
       ? `${ACTION_COPY[accepted.action].label} accepted ${formatDuration(waited)} ago. Waiting for Railway to report it.`
       : `Railway accepted the ${ACTION_COPY[accepted.action].label.toLowerCase()} ${formatDuration(waited)} ago and still reports ${copy.label.toLowerCase()}. You can try again.`;
 
-  const host = container.url?.replace("https://", "");
   const titleId = `container-${container.id}`;
 
   return (
     <li>
-      <article aria-labelledby={titleId} className="rounded-xl border border-line bg-surface p-4">
-        <header className="flex items-start justify-between gap-3">
+      <article aria-labelledby={titleId} className="rounded-lg border border-line bg-surface p-4">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 id={titleId} className="truncate font-mono text-sm font-semibold">
+            <h3 id={titleId} className="truncate font-mono text-sm font-medium">
               {container.name}
             </h3>
             <p className="mt-0.5 text-xs text-dim">
@@ -100,37 +93,38 @@ export function ContainerCard({ container, now, unlocked, onPublished }: Contain
             </p>
           </div>
           <StateChip state={state} />
-        </header>
-
-        <p className="mt-3 min-h-10 text-sm">{copy.meaning}</p>
-
-        <div className="mt-2 min-h-10 text-xs">
-          {container.url ? (
-            <a href={container.url} target="_blank" rel="noreferrer" className="block truncate py-1 font-mono text-accent underline underline-offset-2">
-              {host}
-            </a>
-          ) : (
-            <span className="block py-1 text-dim">No public URL yet.</span>
-          )}
-          <span className="text-dim">{container.url ? (URL_HINT[state] ?? "Does not answer while the container is down.") : null}</span>
         </div>
 
-        <p className="mt-3 border-t border-line pt-3 font-mono text-[11px] leading-relaxed text-dim">
-          <span className="font-sans">Railway reports: </span>
-          {reportedLine(container.reported)}
-        </p>
+        <div className="mt-3 text-xs">
+          {container.url ? (
+            <a href={container.url} target="_blank" rel="noreferrer" className="block truncate font-mono underline underline-offset-2">
+              {container.url.replace("https://", "")}
+            </a>
+          ) : (
+            <span className="text-dim">No public URL yet.</span>
+          )}
+          <p className="mt-1.5 min-h-8 font-mono sm:min-h-0">
+            <span className="font-sans text-dim">Railway reports </span>
+            {reportedLine(container.reported)}
+          </p>
+        </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Button variant="primary" disabled={busy || awaitingReport || spinRefusal !== null} onClick={() => act.mutate(spin)}>
+        <div className="mt-4 flex gap-2">
+          <Button
+            variant="primary"
+            className="flex-1 sm:flex-none"
+            disabled={!unlocked || busy || awaitingReport || refusal !== null}
+            onClick={() => act.mutate(spin)}
+          >
             {doing(spin) ? `${ACTION_COPY[spin].doing}…` : ACTION_COPY[spin].label}
           </Button>
-          <Button variant="danger" disabled={busy || !unlocked || !actions.destroy.allowed} onClick={destroy}>
+          <Button variant="danger" className="flex-1 sm:flex-none" disabled={!unlocked || busy || !actions.destroy.allowed} onClick={destroy}>
             {doing("destroy") ? "Destroying…" : confirmingDestroy ? "Tap again to destroy" : "Destroy"}
           </Button>
         </div>
 
-        <div aria-live="polite" className="mt-2 min-h-5 text-xs text-dim">
-          {act.error ? <ProblemNote problem={problemOf(act.error)!} className="text-xs" /> : (acceptedNote ?? spinRefusal)}
+        <div aria-live="polite" className="mt-2 min-h-4 text-xs text-dim">
+          {act.error ? <ProblemNote problem={problemOf(act.error)!} /> : (acceptedNote ?? refusal ?? copy.hint)}
         </div>
       </article>
     </li>

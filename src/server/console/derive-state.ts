@@ -64,8 +64,8 @@ const REFUSALS: Record<ContainerState, Partial<Record<ContainerAction, string>>>
   stopping: { start: "Wait until it has stopped.", stop: "It is already stopping." },
   stopped: { stop: "It is already stopped." },
   sleeping: {
-    start: "Railway refuses to restart a sleeping container. Open its URL to wake it.",
-    stop: "Railway refuses to stop a sleeping container. It is already idle.",
+    start: "Railway will not restart a sleeping container. Open its URL to wake it.",
+    stop: "Railway will not stop a sleeping container. Open its URL to wake it.",
   },
   crashed: { stop: "Nothing is running." },
   failed: { stop: "Nothing is running." },

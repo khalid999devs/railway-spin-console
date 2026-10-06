@@ -14,7 +14,7 @@ const TONES: Record<Tone, string> = {
 export function StateChip({ state }: { state: ContainerState }) {
   const { label, tone } = STATE_COPY[state];
   return (
-    <span className={`inline-flex min-w-24 shrink-0 items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${TONES[tone]}`}>
+    <span className={`inline-flex min-w-22 shrink-0 items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${TONES[tone]}`}>
       <span aria-hidden className={`size-1.5 rounded-full bg-current ${tone === "busy" ? "animate-pulse motion-reduce:animate-none" : ""}`} />
       {label}
     </span>

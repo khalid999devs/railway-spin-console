@@ -14,9 +14,9 @@ export const LIMITS = { maxContainers: 3, lifetimeMs: 30 * 60_000 } as const;
  * Railway reports its stop. `traefik/whoami` failed that check.
  */
 export const IMAGES: readonly ImageOption[] = [
-  { id: "nginx", label: "nginx", image: "nginx:alpine" },
-  { id: "httpd", label: "Apache", image: "httpd:alpine" },
-  { id: "caddy", label: "Caddy", image: "caddy:alpine" },
+  { id: "nginx", image: "nginx:alpine" },
+  { id: "httpd", image: "httpd:alpine" },
+  { id: "caddy", image: "caddy:alpine" },
 ];
 export const CONTAINER_PORT = 80;
 

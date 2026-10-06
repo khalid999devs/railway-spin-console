@@ -40,7 +40,6 @@ export interface ContainerView {
 
 export interface ImageOption {
   id: string;
-  label: string;
   image: string;
 }
 

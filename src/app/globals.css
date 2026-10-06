@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f6f6f8;
+  --bg: #fafafa;
   --surface: #ffffff;
-  --line: #e2e2e8;
-  --ink: #16161b;
-  --dim: #5c5c68;
-  --accent: #5137e0;
-  --on-accent: #ffffff;
+  --line: #e5e5e5;
+  --ink: #171717;
+  --dim: #666666;
+  --focus: #2563eb;
 
   --ok: #0c6638;
   --ok-soft: #e2f4e9;
@@ -23,13 +22,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0b0b0f;
-    --surface: #14141a;
-    --line: #2a2a34;
-    --ink: #ececf1;
-    --dim: #a3a3b0;
-    --accent: #9a88ff;
-    --on-accent: #0b0b0f;
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --line: #2a2a2a;
+    --ink: #ededed;
+    --dim: #a1a1a1;
+    --focus: #60a5fa;
 
     --ok: #72e3a6;
     --ok-soft: #10261a;
@@ -50,8 +48,6 @@
   --color-line: var(--line);
   --color-ink: var(--ink);
   --color-dim: var(--dim);
-  --color-accent: var(--accent);
-  --color-on-accent: var(--on-accent);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
   --color-busy: var(--busy);
@@ -76,6 +72,6 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
