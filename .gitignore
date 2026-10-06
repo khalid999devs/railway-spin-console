@@ -16,3 +16,7 @@ next-env.d.ts
 # playwright
 test-results/
 playwright-report/
+
+# editor and agent tooling
+AGENTS.md
+CLAUDE.md
