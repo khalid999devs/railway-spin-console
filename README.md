@@ -1,47 +1,41 @@
 # Spin Console
 
-Spin a container up and down on [Railway](https://railway.com) through its public GraphQL API.
+A small web app that spins containers up and down on [Railway](https://railway.com) through its public GraphQL API. Built for the take-home in Railway's hiring process: *"Build an application to spin up and spin down a container using our GQL API."*
 
-This is my take on the take-home in Railway's hiring process for the Senior Full-Stack Engineer (Product) role: *"Build an application to spin up and spin down a container using our GQL API."* The app keeps no data of its own. Every state on the screen is what Railway reports, read fresh.
+**Live demo:** https://spin-console-production.up.railway.app
 
-**Live:** https://spin-console-production.up.railway.app (anyone can view; changes need a passphrase, which I share for the review)
+Anyone can open it and watch. Making changes needs a passphrase.
 
-<img src="docs/screenshot.png" alt="Spin Console at phone width: the image picker, and one running container with its URL, Railway's reported status and the spin down and destroy buttons" width="300">
-
-| | |
-|---|---|
-| Design reasoning | [docs/erd.md](docs/erd.md) |
-| What the API actually did when probed | [docs/api-findings.md](docs/api-findings.md) |
-| Code tour | [docs/walkthrough.md](docs/walkthrough.md) |
+<img src="docs/screenshot.png" alt="Spin Console on a phone: an image picker with a Spin up button, and one running container showing its URL, the status Railway reports, and Spin down and Destroy buttons" width="300">
 
 ## Contents
 
-- [What it does](#what-it-does)
-- [Architecture](#architecture)
-- [Request flows](#request-flows)
-- [State model](#state-model)
-- [Engineering decisions](#engineering-decisions)
-- [Cost and safety guards](#cost-and-safety-guards)
+- [What you can do](#what-you-can-do)
+- [How it works](#how-it-works)
+- [Container states](#container-states)
+- [Design decisions](#design-decisions)
+- [Safety limits](#safety-limits)
 - [Tech stack](#tech-stack)
 - [Project structure](#project-structure)
-- [Getting started](#getting-started)
-- [Testing](#testing)
-- [Live smoke test](#live-smoke-test)
+- [Running it](#running-it)
+- [Tests](#tests)
+- [Live test](#live-test)
 - [Deployment](#deployment)
-- [Known limits and next steps](#known-limits-and-next-steps)
+- [Known limits](#known-limits)
+- [Further reading](#further-reading)
 
-## What it does
+## What you can do
 
-| Action | Railway call | Effect |
-|---|---|---|
-| **Spin up** (new) | `serviceCreate`, `serviceDomainCreate`, `serviceInstanceUpdate`, `serviceInstanceDeployV2` | A service in the sandbox project from one of three images, with a public URL, deployed |
-| **Spin down** | `deploymentStop` | The container stops. The service and its URL stay |
-| **Spin up** (again) | `deploymentRestart` | The same container resumes in about a second |
-| **Destroy** | `serviceDelete` | The service and its URL are deleted |
+| Button | What happens on Railway |
+|---|---|
+| **Spin up** | A new service is created from the image you picked, given a public URL, and deployed |
+| **Spin down** | The container stops. The service and its URL are kept |
+| **Spin up** (on a stopped container) | The same container resumes in about a second |
+| **Destroy** | The service and its URL are deleted |
 
-Each card shows the state in words, the container's URL, Railway's raw values (`status`, `deploymentStopped`, instance status), its age and the time left before it is destroyed automatically.
+Each container card shows its state, its public URL, the exact status Railway reports, its age, and how long until it is removed automatically.
 
-## Architecture
+## How it works
 
 ```mermaid
 flowchart LR
@@ -79,18 +73,17 @@ flowchart LR
     API -. "RAILWAY_FAKE=1" .-> FAKE["In-memory fake"]
 ```
 
-Four properties follow from this shape:
+The main ideas:
 
-- **No database.** The sandbox project is the only store. A refresh, an app restart or a deletion in Railway's dashboard cannot leave the app disagreeing with reality, because there is no second copy to disagree.
-- **One boundary.** [`src/server/railway`](src/server/railway) is the only code that knows Railway exists. Everything else depends on the [`RailwayApi`](src/server/railway/api.ts) interface, so the real client and the fake are interchangeable.
-- **One decision point.** [`deriveState`](src/server/console/derive-state.ts) turns Railway's report into a state and the allowed actions. The server sends both, so a button is disabled for the same reason the API would refuse the call.
-- **Least privilege.** The app runs in one Railway project and holds a project token for a separate sandbox project. A bug in "destroy" cannot reach the app, and a leaked token cannot reach the rest of the account.
-
-## Request flows
+- **Railway is the only source of truth.** The app has no database. Every state on the screen comes from a fresh read of Railway, so a page refresh, an app restart, or a change made in Railway's own dashboard can never leave the app out of step.
+- **The browser never talks to Railway.** It talks to the app's own API. The Railway token stays on the server.
+- **One module knows about Railway.** Everything in [`src/server/railway`](src/server/railway) sits behind the [`RailwayApi`](src/server/railway/api.ts) interface, so the real client and an in-memory fake are interchangeable.
+- **One function decides what a container's state is.** [`deriveState`](src/server/console/derive-state.ts) turns Railway's report into a state and a list of allowed actions. The server sends both to the browser, so a button is disabled for the same reason the API would refuse the request.
+- **The app can only reach the sandbox.** It runs in one Railway project and holds a token for a separate sandbox project, so it cannot affect anything else in the account.
 
 ### Reading state
 
-The browser polls the app, never Railway (the API's CORS policy allows only `railway.com`, and the token must stay on the server). The server tells the browser how soon to ask again.
+The browser asks the app for the current state on a timer. The app decides how often.
 
 ```mermaid
 sequenceDiagram
@@ -111,7 +104,9 @@ sequenceDiagram
     end
 ```
 
-Ten open tabs share one Railway request (single flight), and reads spend from a token bucket sized from Railway's `RateLimit-Policy` header. At 1,000 requests an hour that caps reads at 820 an hour whatever browsers do, and leaves the rest for writes. With no tab open, the app makes no requests at all.
+- Many open tabs share a single Railway request.
+- Reads are paced by a token bucket sized from Railway's `RateLimit-Policy` header, so the app stays inside the hourly API limit however many browsers are polling.
+- When no tab is open, the app makes no requests at all.
 
 ### Spinning up
 
@@ -140,9 +135,11 @@ sequenceDiagram
     Note over B,A: the browser polls until Railway reports SUCCESS with a RUNNING instance
 ```
 
-If Railway gives no answer to a mutation, the app does not blindly resend it. It reads the sandbox first to see whether the call took effect ("look before repeating"), and repeats only if it did not.
+- **A double click creates one container.** The browser sends an operation id with each request, the id becomes the service name, and Railway refuses a second service with the same name.
+- **Writes run one at a time,** which keeps the three-container limit exact.
+- **A lost response is not blindly retried.** If Railway does not answer, the app first checks whether the change happened, and only then decides whether to send it again.
 
-## State model
+## Container states
 
 ```mermaid
 stateDiagram-v2
@@ -160,129 +157,125 @@ stateDiagram-v2
     crashed --> starting: spin up
 ```
 
-Every container also becomes `expired` at 30 minutes old and is destroyed by the app. Destroy is allowed from every state except `removing` and `expired`. Anything the app does not recognise becomes `unknown` and shows Railway's raw values instead of a guess.
+Every container also becomes `expired` when it is 30 minutes old, and the app destroys it. Destroy is available in every state except `removing` and `expired`.
 
-How each state is derived, in the order the checks run:
-
-| State | Railway reports | Allowed |
+| State | What Railway reports | Buttons available |
 |---|---|---|
-| `expired` | older than 30 minutes | nothing (being destroyed) |
-| `idle` | no deployment | start, destroy |
-| `starting` | `INITIALIZING`, `BUILDING`, `DEPLOYING`, `QUEUED`, `WAITING` | destroy |
-| `sleeping` | `SLEEPING` | destroy (wake it by opening its URL) |
-| `crashed`, `failed` | `CRASHED`, `FAILED` | start, destroy |
-| `removing` | `REMOVING` | nothing |
-| `stopped` | `SUCCESS` + `deploymentStopped` + instances exited | start, destroy |
-| `stopping` | `SUCCESS` + `deploymentStopped` + an instance still up | destroy |
-| `running` | `SUCCESS` + not stopped + an instance `RUNNING` | stop, destroy |
-| `unknown` | anything else | destroy |
+| `idle` | no deployment | Spin up, Destroy |
+| `starting` | `INITIALIZING`, `BUILDING`, `DEPLOYING`, `QUEUED` or `WAITING` | Destroy |
+| `running` | `SUCCESS`, not stopped, an instance `RUNNING` | Spin down, Destroy |
+| `stopping` | `SUCCESS`, stopped, an instance still up | Destroy |
+| `stopped` | `SUCCESS`, stopped, instances exited | Spin up, Destroy |
+| `sleeping` | `SLEEPING` | Destroy (opening the URL wakes it) |
+| `crashed`, `failed` | `CRASHED`, `FAILED` | Spin up, Destroy |
+| `removing` | `REMOVING` | none |
+| `expired` | older than 30 minutes | none |
+| `unknown` | anything else | Destroy |
 
-The order matters, and it comes from probing the API rather than from the docs:
+Railway's fields are easy to misread, so the order of the checks matters:
 
-1. A stopped deployment still has `status: SUCCESS`. Reading `SUCCESS` as "up" shows a stopped container as running.
-2. A starting deployment has `deploymentStopped: true`. Reading that flag first shows a starting container as stopped.
-3. A sleeping deployment has `deploymentStopped: true` **and** an instance reading `RUNNING`.
+1. A stopped deployment still has `status: SUCCESS`.
+2. A starting deployment has `deploymentStopped: true`.
+3. A sleeping deployment has `deploymentStopped: true` and an instance that reads `RUNNING`.
 
-So `status` is read first, and the flag only when `status` is `SUCCESS`.
+The app therefore reads `status` first, and looks at `deploymentStopped` only when `status` is `SUCCESS`. Anything it does not recognise is shown as `unknown` together with Railway's raw values.
 
-## Engineering decisions
+## Design decisions
 
-| Decision | Why | Rejected |
+| Decision | Reason | Alternative not chosen |
 |---|---|---|
-| Railway is the only source of truth | Nothing to reconcile after a crash, a refresh or a change made in Railway's dashboard | A database with an operations table: history and crash recovery, at the price of a second service, migrations and a reconciler |
-| Idempotent create from the service name | The browser's operation id becomes the name and Railway rejects duplicates, observed with two simultaneous calls | An idempotency-key table |
-| Serial in-process write queue | Removes double-click and cap races on one instance with ten lines of code | Distributed locks |
-| "Look before repeating" | A mutation with no answer may have run. Reading Railway first avoids a second domain or a second deploy | Blind retries |
-| Polling paced by a token bucket | A stop does not change `status`, so a status subscription would miss it. Browser-driven polling costs nothing when nobody is looking | GraphQL subscriptions, or a background poller |
-| Zod at the boundary, documents validated in a test | The risk is in what arrives at runtime. A test validates every GraphQL document against the committed schema | gql.tada or codegen, which type what the schema promises |
-| "Accepted" is not "done" | `deploymentStop` returns `true` whether or not anything happens. The UI shows the request was accepted and keeps Railway's reported state until it changes | Optimistic UI |
-| An allow-list of probed images | `traefik/whoami` accepts a stop that Railway then never reports. An image is allowed only after `npm run probe -- imageStop <image>` passes | A free-text image field |
+| No database; Railway holds all state | Nothing to keep in sync after a crash, a refresh, or a change made in Railway's dashboard | A database with an operations table, which adds a second service, migrations and a reconciler |
+| The operation id is the service name | Railway rejects duplicate names, which makes "create" safe to repeat | A separate idempotency-key table |
+| A serial write queue inside the server | Removes double-click and limit races with very little code | Distributed locks |
+| Check Railway before repeating a write | A request with no answer may still have run | Automatic retries |
+| Polling, paced by a token bucket | A stop does not change `status`, so a status subscription would miss it. Polling from the browser costs nothing when nobody is looking | GraphQL subscriptions, or a background poller |
+| Validate responses with Zod at runtime | The risk is in what actually arrives. A test also checks every GraphQL document against Railway's schema | Generated GraphQL types |
+| Show "accepted" separately from the new state | `deploymentStop` returns `true` before the container has stopped, so the screen keeps Railway's reported state until it changes | Optimistic UI |
+| A fixed list of tested images | Each image is checked to make sure Railway reports its stop correctly | A free-text image field |
 
-The longer argument for each is in [docs/erd.md](docs/erd.md). The probe that drove several of them, including six places where the API differs from its documentation, is written up in [docs/api-findings.md](docs/api-findings.md).
+The full reasoning is in [docs/erd.md](docs/erd.md).
 
-## Cost and safety guards
+## Safety limits
 
-The URL is public and the credit is mine.
+The demo is public, so the app limits what a visitor can do:
 
-| Guard | Where |
-|---|---|
-| Reads are open; writes need a passphrase, exchanged for an HMAC-signed, HttpOnly, SameSite=Lax cookie. Wrong attempts are throttled per address | [`src/server/auth`](src/server/auth), [`respond.ts`](src/server/http/respond.ts) |
-| At most 3 containers, stopped ones included | [`service.ts`](src/server/console/service.ts) |
-| A fixed list of images; no free-text field | [`config.ts`](src/server/config.ts) |
-| Every container is destroyed after 30 minutes, by a timer that calls Railway only when one is due | [`service.ts`](src/server/console/service.ts), [`instrumentation.ts`](src/instrumentation.ts) |
-| Serverless sleep on every container | [`service.ts`](src/server/console/service.ts) |
-| Only services named `spin-` plus 8 characters are ever listed or touched | [`config.ts`](src/server/config.ts), [`view.ts`](src/server/console/view.ts) |
-| The token never reaches the browser; a build check proves it | [`scripts/check-bundle.mts`](scripts/check-bundle.mts) |
+- **Passphrase for changes.** Viewing is open. Any change needs a shared passphrase, which is exchanged for a signed, HttpOnly session cookie. Wrong attempts are rate limited.
+- **At most 3 containers,** including stopped ones.
+- **A fixed list of images.** No free-text image field.
+- **30-minute lifetime.** Every container is destroyed automatically.
+- **Serverless sleep** is enabled on every container.
+- **Only the app's own services are touched.** It lists and acts on services named `spin-` plus 8 characters and ignores everything else in the project.
+- **The token stays on the server.** A build check fails if the token or the Railway API host appears in browser code.
 
-The passphrase is a cost barrier, not authentication. It has no users and no revocation short of changing it.
+The passphrase is a cost barrier, not user authentication.
 
 ## Tech stack
 
 | Layer | Choice |
 |---|---|
 | Framework | Next.js 16 (App Router, route handlers, standalone output) |
-| Language | TypeScript, strict |
+| Language | TypeScript (strict) |
 | UI | React 19, Tailwind CSS 4 |
-| Client data | TanStack Query 5 (server-paced polling) |
-| Validation | Zod 4 on every Railway response and request body |
-| Railway API | GraphQL over `fetch`, no client library |
-| Tests | Vitest 5 (unit and route handlers), Playwright (end to end), graphql-js (document validation) |
-| Runtime | Node 24, Docker multi-stage build |
-| Hosting | Railway: one project for the app, one sandbox project for the containers |
+| Client data | TanStack Query 5 |
+| Validation | Zod 4 |
+| Railway API | GraphQL over `fetch` |
+| Tests | Vitest, Playwright |
+| Runtime | Node 24, Docker |
+| Hosting | Railway |
 
 ## Project structure
 
 ```
 src/
   app/
-    api/                    route handlers, a few lines each
+    api/                    route handlers
     page.tsx, layout.tsx    the single page
   components/               console, control panel, container card
   hooks/                    polling and the server clock
-  lib/contract.ts           types shared by server responses and the browser
+  lib/contract.ts           types shared by the server and the browser
   server/
-    railway/                the Railway boundary
-      api.ts                  interface the rest of the app depends on
-      transport.ts            auth header, errors-as-HTTP-200, retry rule, timeouts
-      errors.ts               classification from message and code
-      schemas.ts              Zod shapes for each response
-      documents.ts            the nine GraphQL documents
-      budget.ts               request count and read token bucket
-      fake.ts                 in-memory Railway, computed from a clock
+    railway/                everything that talks to Railway
+      api.ts                  the interface the rest of the app uses
+      transport.ts            HTTP, auth header, error handling, retries
+      errors.ts               error classification
+      schemas.ts              response validation
+      documents.ts            the GraphQL documents
+      budget.ts               request counting and read pacing
+      fake.ts                 in-memory Railway for tests and local use
     console/
       derive-state.ts         Railway's report -> state and allowed actions
-      service.ts              use cases; idempotent create; look before repeating
-      reader.ts               single-flight read cache
+      service.ts              create, start, stop, destroy, lifetimes
+      reader.ts               cached reads of the sandbox
       queue.ts                serial write queue
-      view.ts                 snapshot sent to the browser
-    auth/                   signed session cookie, attempt throttle
-    runtime.ts              composition root: picks the real client or the fake
+      view.ts                 the data sent to the browser
+    auth/                   session cookie and attempt throttle
+    runtime.ts              wires the app together
 scripts/
-  probe.mts                 probes the real API; vets images
-  smoke.mts                 live smoke test
-  check-bundle.mts          fails if a secret or the API host is in the client bundle
-schema/railway.graphql      Railway's schema, introspected without a token
-tests/fixtures/probe/       raw request/response logs from the probe, replayed by tests
-e2e/                        Playwright
-docs/                       ERD, API findings, walkthrough
+  probe.mts                 exercises the real API and records what it does
+  smoke.mts                 end-to-end test of the deployed app
+  check-bundle.mts          checks that no secret reaches the browser
+schema/railway.graphql      Railway's GraphQL schema
+tests/fixtures/probe/       recorded API responses used by the tests
+e2e/                        Playwright test
+docs/                       design document, API findings, code tour
 ```
 
-## Getting started
+## Running it
 
-Needs Node 24.
+Requires Node 24.
 
-**Without a Railway account.** The app runs against an in-memory fake that behaves the way the probe saw the real API behave:
+**Without a Railway account.** The app runs against an in-memory fake that behaves like the real API:
 
 ```bash
 npm install
 npm run dev:fake        # http://localhost:3000, passphrase: demo
 ```
 
-**Against Railway.** Create an empty project to act as the sandbox, create a project token for its `production` environment (Project → Settings → Tokens), and put three variables in `.env.local`:
+**Against Railway.** Create an empty Railway project to use as the sandbox, create a project token for its `production` environment (Project → Settings → Tokens), and add three variables to `.env.local`:
 
 ```bash
 RAILWAY_SANDBOX_TOKEN=   # the project token
-CONSOLE_PASSPHRASE=      # anything; unlocks the buttons
+CONSOLE_PASSPHRASE=      # any passphrase; it unlocks the buttons
 SESSION_SECRET=          # openssl rand -hex 32
 ```
 
@@ -290,82 +283,48 @@ SESSION_SECRET=          # openssl rand -hex 32
 npm run dev
 ```
 
-The app reads the project and environment from the token, so there are no ids to configure. Keep `$` out of the values, or write it as `\$`: Next.js treats `$NAME` in an env file as a reference to another variable.
+The app reads the project and environment from the token, so there are no ids to configure. If a value contains `$`, write it as `\$`.
 
-| Script | What it runs |
+**Scripts**
+
+| Command | What it does |
 |---|---|
-| `npm run verify` | lint, typecheck, unit tests, production build, client bundle check |
-| `npm run e2e` | Playwright against the production build and the fake |
-| `npm run smoke -- <url>` | the live smoke test below (creates real containers) |
-| `npm run probe -- <scenario>` | the API probe (`lifecycle`, `followups`, `imageStop <image>`, `cleanup`, …) |
+| `npm run verify` | Lint, type check, unit tests, production build, and the browser bundle check |
+| `npm run e2e` | Playwright test against the production build, using the fake |
+| `npm run smoke -- <url>` | Tests a deployed app against real Railway |
+| `npm run probe -- <scenario>` | Exercises the real Railway API and records the responses |
 
-## Testing
+## Tests
 
-| Layer | Covers | Needs |
-|---|---|---|
-| Unit ([`derive-state.test.ts`](src/server/console/derive-state.test.ts)) | Every state as a table, the three traps, and a replay of the recorded probe run | nothing |
-| Unit ([`errors`](src/server/railway/errors.test.ts), [`transport`](src/server/railway/transport.test.ts), [`budget`](src/server/railway/budget.test.ts), [`documents`](src/server/railway/documents.test.ts)) | Classification of the errors the real API returned, the retry rule, the token bucket bound, every document against the schema | nothing |
-| Service ([`service.test.ts`](src/server/console/service.test.ts)) | Idempotent create, a double click, lost responses, the cap under concurrency, the lifetime sweep, services it must never touch | the fake |
-| Route handlers ([`routes.test.ts`](src/app/api/routes.test.ts)) | The passphrase gate, throttling, cross-site refusal, status codes, the whole lifecycle over HTTP | the fake |
-| End to end ([`e2e/console.spec.ts`](e2e/console.spec.ts)) | The main flow at phone width through the production build | the fake, Chromium |
-| Live smoke ([`scripts/smoke.mts`](scripts/smoke.mts)) | The deployed app against real Railway | a token |
-
-212 unit and route tests run in under a second, with no token and no network.
-
-To check the tests would notice, I broke seven things on purpose, one at a time, and restored them:
-
-| Deliberate break | Result |
+| Test | What it covers |
 |---|---|
-| `deriveState` reads `deploymentStopped` before `status` | 29 tests fail |
-| A mutation is repeated without looking at Railway first | 4 tests fail |
-| Every service in the sandbox counts as the app's own | 5 tests fail |
-| The session signature is not checked | 3 tests fail |
-| The transport retries mutations like queries | 1 test fails |
-| Writes skip the serial queue | 2 tests fail |
-| The API host is imported into a client component | `check:bundle` fails |
+| [State derivation](src/server/console/derive-state.test.ts) | Every state, the three easy-to-misread cases, and a replay of recorded Railway responses |
+| [Railway client](src/server/railway) | Error classification, the retry rule, request pacing, and every GraphQL document checked against Railway's schema |
+| [Console service](src/server/console/service.test.ts) | Repeat-safe create, double clicks, lost responses, the container limit under concurrency, automatic expiry, and services the app must never touch |
+| [API routes](src/app/api/routes.test.ts) | The passphrase gate, rate limiting, cross-site requests, status codes, and the full lifecycle over HTTP |
+| [End to end](e2e/console.spec.ts) | The main flow in a phone-sized browser against the production build |
 
-## Live smoke test
+212 unit and route tests run in under a second with no token and no network access.
 
-Run on 6 Oct 2026 at 09:41 UTC with `npm run smoke -- https://spin-console-production.up.railway.app`: the deployed app, real Railway, and a new browser context for each pass (no cookies, no cache). "Seconds" is what a visitor waits, so it includes the app's 2-second polling.
+## Live test
 
-**Desktop, 1280 px**
+The deployed app tested against real Railway on 6 October 2026, in a fresh browser at desktop and phone width (`npm run smoke`). Times are in seconds, as a visitor experiences them.
 
-| Step | Seconds | Result |
-|---|---|---|
-| Open the page | 1.7 | locked, 0 containers |
-| Unlock with the passphrase | 0.9 | unlocked |
-| Spin up (double click) until the card appears | 1.8 | 1 container, spin-09b6644c |
-| Refresh the page mid-deploy | 1.1 | 1 container still listed |
-| Wait until Railway reports running | 6.8 | SUCCESS · stopped no · RUNNING |
-| Request the container's own URL | 0.7 | HTTP 200 |
-| Spin down until Railway reports stopped | 2.8 | SUCCESS · stopped yes · EXITED |
-| Request the URL while stopped | 8.0 | no answer within 8 s |
-| Spin up again until Railway reports running | 3.8 | SUCCESS · stopped no · RUNNING |
-| Request the URL again | 0.4 | HTTP 200 |
-| Destroy (two taps) until the card is gone | 4.4 | 0 containers |
+| Step | Desktop | Phone | Result |
+|---|---|---|---|
+| Open the page | 1.7 | 1.2 | Locked, no containers |
+| Unlock with the passphrase | 0.9 | 0.9 | Unlocked |
+| Spin up, with a double click | 1.8 | 1.8 | One container created |
+| Refresh the page during the deploy | 1.1 | 0.6 | Container still listed |
+| Wait for Railway to report running | 6.8 | 9.3 | `SUCCESS`, instance `RUNNING` |
+| Open the container's URL | 0.7 | 0.8 | HTTP 200 |
+| Spin down | 2.8 | 2.8 | `SUCCESS`, stopped, instance `EXITED` |
+| Open the URL while stopped | | | No answer |
+| Spin up again | 3.8 | 5.3 | `SUCCESS`, instance `RUNNING` |
+| Open the URL again | 0.4 | 0.4 | HTTP 200 |
+| Destroy | 4.4 | 4.9 | Container removed |
 
-**Phone, 412 px (Pixel 7)**
-
-| Step | Seconds | Result |
-|---|---|---|
-| Open the page | 1.2 | locked, 0 containers |
-| Unlock with the passphrase | 0.9 | unlocked |
-| Spin up (double click) until the card appears | 1.8 | 1 container, spin-32986bb9 |
-| Refresh the page mid-deploy | 0.6 | 1 container still listed |
-| Wait until Railway reports running | 9.3 | SUCCESS · stopped no · RUNNING |
-| Request the container's own URL | 0.8 | HTTP 200 |
-| Spin down until Railway reports stopped | 2.8 | SUCCESS · stopped yes · EXITED |
-| Request the URL while stopped | 8.0 | no answer within 8 s |
-| Spin up again until Railway reports running | 5.3 | SUCCESS · stopped no · RUNNING |
-| Request the URL again | 0.4 | HTTP 200 |
-| Destroy (two taps) until the card is gone | 4.9 | 0 containers |
-
-Afterwards the sandbox held 0 containers, and the app had made 59 of its 1,000 hourly Railway requests.
-
-Two things from an earlier run the same day, read from the app's HTTP log:
-
-- **The double click really did send two requests.** Two `POST /api/containers` arrived in the same second with one operation id, and one container was created.
-- **One destroy took 17.9 s.** Railway had not answered `serviceDelete` within the app's 15-second timeout. The app looked at Railway, saw the container was gone and reported success. The write timeout is now 30 seconds so a slow delete is not sent twice.
+The sandbox was empty afterwards.
 
 ## Deployment
 
@@ -381,34 +340,31 @@ flowchart LR
     APP -- "project token<br/>(sandbox only)" --> P2
 ```
 
-- **Build:** a multi-stage [`Dockerfile`](Dockerfile) producing Next.js standalone output on Node 24. The server is started with `node server.js` directly, so `SIGTERM` reaches it and a clean stop is not reported as a crash.
-- **Health check:** `/api/health` answers 200 when the process is up and its configuration is complete. It does not call Railway's API, so an API outage cannot take the app's own deploy down.
-- **Variables:** `RAILWAY_SANDBOX_TOKEN`, `CONSOLE_PASSPHRASE`, `SESSION_SECRET`, set in the service's Variables tab.
+- **Build:** a multi-stage [`Dockerfile`](Dockerfile) that produces Next.js standalone output on Node 24.
+- **Health check:** `/api/health` returns 200 when the server is up and correctly configured.
+- **Variables:** `RAILWAY_SANDBOX_TOKEN`, `CONSOLE_PASSPHRASE` and `SESSION_SECRET`, set on the service.
 - **Deploy:** `railway up --service spin-console`.
 
-## Known limits and next steps
+## Known limits
 
-**Limits**
-
-- **One app instance.** The write queue, read cache, request budget and attempt throttle are in memory. Two instances could not create duplicates, because Railway's name uniqueness is the lock, but could race past the cap.
-- **As right as Railway's report.** The app repeats what the API says, and the `traefik/whoami` case shows the API can be wrong about a container.
+- **Single instance.** The write queue, read cache, request counter and attempt throttle live in memory. A second instance could not create duplicates, but could exceed the container limit.
+- **The app trusts Railway's report.** If the API reports a wrong status for a container, the app shows it.
 - **No history** of who did what.
-- **The lifetime needs the app running.** While it is down, containers outlive 30 minutes; serverless sleep bounds the cost.
-- **`crashed` and `failed` have not been seen against the real API.** No probe deploy failed, so those two states come from the schema's enum.
-- **In fake mode a sleeping container stays asleep,** because its URL is not real and cannot be opened to wake it.
+- **Expiry needs the app running.** If the app is down, containers live past 30 minutes until it is back.
+- **`crashed` and `failed` are based on Railway's schema** and have not been seen in a real deployment.
 
-**Next, in order**
+**What I would build next**
 
-1. **Login with Railway (OAuth).** Each visitor uses their own account; the shared token and the passphrase disappear.
-2. **A Postgres operations table and a reconciler,** once there are several users or instances: history, crash recovery, a cap enforced in a transaction.
-3. **Logs on each card** from `deploymentLogs`.
-4. **A report-versus-reality check:** request each running container's URL and flag when Railway says running and nothing answers.
+1. **Login with Railway (OAuth),** so each visitor uses their own account and the shared passphrase goes away.
+2. **A Postgres operations table,** once there are several users or instances, for history and a limit enforced in a transaction.
+3. **Logs on each container card.**
+4. **A reachability check** that requests each container's URL and flags a mismatch with Railway's reported status.
 
-## Notes
+## Further reading
 
-I built this with Claude Code, working from a brief I prepared: it wrote the code, the probe and the first drafts of these documents. The constraints were mine (small and stateless instead of a database and a background observer, the two-project split, the cost guards, a phone-first screen), and I reviewed the design before the build and accepted the changes the probe forced.
-
-The brief included API behaviour reported in the write-ups of two public solutions to this take-home, [paveliko/railway-container-console](https://github.com/paveliko/railway-container-console) and [V473r10/railway-take-home](https://github.com/V473r10/railway-take-home). I did not read their source code. Every finding marked "Observed" in [docs/api-findings.md](docs/api-findings.md) comes from my own probe, and its raw logs are in [`tests/fixtures/probe`](tests/fixtures/probe). Both of those solutions are larger, with a database and a background observer; this one stores nothing and polls only while someone is looking.
+- [Design document](docs/erd.md): the problem, each decision and its alternative, and the limits.
+- [Railway API findings](docs/api-findings.md): how the API behaves in practice, including where it differs from the documentation.
+- [Code tour](docs/walkthrough.md): where to start reading and what each part does.
 
 ---
 
