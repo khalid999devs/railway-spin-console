@@ -23,6 +23,7 @@ Anyone can open it and watch. Making changes needs a passphrase.
 - [Deployment](#deployment)
 - [Known limits](#known-limits)
 - [Further reading](#further-reading)
+- [Acknowledgements](#acknowledgements)
 
 ## What you can do
 
@@ -365,6 +366,12 @@ flowchart LR
 - [Design document](docs/erd.md): the problem, each decision and its alternative, and the limits.
 - [Railway API findings](docs/api-findings.md): how the API behaves in practice, including where it differs from the documentation.
 - [Code tour](docs/walkthrough.md): where to start reading and what each part does.
+
+## Acknowledgements
+
+I built this with [Claude Code](https://claude.com/claude-code) as the coding agent, which made the build much faster. The scope and the constraints are mine, and I reviewed the design before the build.
+
+Some of the API behaviour I set out to test was first reported in the write-ups of two public solutions to this take-home, [paveliko/railway-container-console](https://github.com/paveliko/railway-container-console) and [V473r10/railway-take-home](https://github.com/V473r10/railway-take-home). I did not read their source code, and every result in [API findings](docs/api-findings.md) comes from this project's own tests.
 
 ---
 
