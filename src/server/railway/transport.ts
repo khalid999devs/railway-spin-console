@@ -5,7 +5,12 @@ import { classifyGraphqlError, isRailwayError, RailwayError } from "./errors";
 
 export const RAILWAY_ENDPOINT = "https://backboard.railway.com/graphql/v2";
 
-const REQUEST_TIMEOUT_MS = 15_000;
+/**
+ * A read that hangs is abandoned quickly because it will be repeated. A write is given longer:
+ * `serviceDelete` took up to 7 s in the probe and more than 15 s once in production, and giving
+ * up early means checking Railway and possibly sending it twice.
+ */
+const TIMEOUT_MS = { query: 10_000, mutation: 30_000 };
 /** Waits before the second and third attempt of a query that got no answer. */
 const QUERY_RETRY_DELAYS_MS = [300, 900];
 
@@ -40,7 +45,7 @@ export function createTransport(options: TransportOptions): Transport {
         method: "POST",
         headers,
         body: JSON.stringify({ query: document.text, variables }),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(TIMEOUT_MS[document.kind]),
         cache: "no-store",
       });
     } catch (cause) {
